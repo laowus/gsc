@@ -1,32 +1,25 @@
 {
   "expo": {
     "name": "古诗词",
-    "slug": "poem",
+    "slug": "gsc",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "poem",
+    "scheme": "gsc",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
-    "assets": [
-      "./assets/database/poem.zip"
-    ],
+    "assets": ["./assets/database/poem.zip"],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "permissions": [
-        "WRITE_EXTERNAL_STORAGE",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "READ_EXTERNAL_STORAGE"
-      ],
-      "package": "com.laowus.poem"
+      "permissions": ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"],
+      "package": "com.laowus.gsc"
     },
     "web": {
       "bundler": "metro",

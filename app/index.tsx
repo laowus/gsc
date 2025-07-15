@@ -15,12 +15,13 @@ export default function StartScreen() {
 
   const fileExist = async (filePath: string) => {
     const fileInfo = await FileSystem.getInfoAsync(filePath);
-    if (fileInfo.exists) {
+    if (fileInfo.exists && fileInfo.size > 0) {
       console.log(`文件 ${filePath} 存在，大小为: ${fileInfo.size} 字节`);
+      return true;
     } else {
-      console.log(`文件 ${filePath} 不存在`);
+      console.log(`文件 ${filePath} 不存在或大小为 0 字节`);
+      return false;
     }
-    return fileInfo.exists;
   };
 
   useEffect(() => {
@@ -57,8 +58,6 @@ export default function StartScreen() {
           console.error("下载资源时出错:", error);
         }
       }
-
-      // }
     };
     checkDatabaseFile();
   }, []);
@@ -74,9 +73,7 @@ export default function StartScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>正在加载...</Text>
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
-      {!isLoading && !isDatabaseLoaded && (
-        <Text style={styles.error}>数据库加载失败</Text>
-      )}
+      {!isLoading && !isDatabaseLoaded && <Text style={styles.error}>数据库加载失败</Text>}
     </View>
   );
 }
@@ -86,14 +83,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#ffffff"
   },
   title: {
     fontSize: 24,
-    marginBottom: 20,
+    marginBottom: 20
   },
   error: {
     fontSize: 18,
-    color: "red",
-  },
+    color: "red"
+  }
 });
