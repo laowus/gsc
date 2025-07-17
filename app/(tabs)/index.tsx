@@ -3,8 +3,8 @@ import { ThemedView } from "@/components/ThemedView";
 import PoetryDao from "@/dao/PoetryDao";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { StyleSheet, FlatList } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context"; // 引入 SafeAreaView
+import { StyleSheet, FlatList, Modal, Button } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const [dbData, setDbData] = useState<any[]>([]);
@@ -14,6 +14,10 @@ export default function HomeScreen() {
   const PAGE_SIZE = 20;
   // 新增状态用于存储诗歌总数
   const [totalPoetryCount, setTotalPoetryCount] = useState<number | null>(null);
+  // 新增状态用于控制 Modal 显示与隐藏
+  const [modalVisible, setModalVisible] = useState(false);
+  // 新增状态用于存储当前要显示的诗歌内容
+  const [selectedContent, setSelectedContent] = useState("");
 
   useEffect(() => {
     loadData();
@@ -46,15 +50,39 @@ export default function HomeScreen() {
     }
   };
 
-  const renderItem = ({ item, index }: { item: any; index: number }) => (
-    // 结合 index 生成唯一 key
-    <ThemedView key={`${item.poetryid}-${index}`} style={styles.card}>
-      <ThemedText>
-        {/* 使用 \n 换行 */}
-        {`${index + 1}、 ${item.title}\n${item.writer.dynasty} *  ${item.writer.writername}`}
-      </ThemedText>
-    </ThemedView>
-  );
+  const renderItem = ({ item, index }: { item: any; index: number }) => {
+    // 移除 HTML 标签
+    const cleanContent = item.content ? item.content.replace(/<[^>]*>/g, "") : "";
+    // 截取前 50 个字符
+    const previewContent = cleanContent.slice(0, 50) || "暂无内容";
+    return (
+      <ThemedView key={`${item.poetryid}-${index}`} style={[styles.card, { flexDirection: "row", gap: 15 }]}>
+        {/* 左边区域，占三分之一宽度 */}
+        <ThemedText style={{ flex: 1 }}>
+          <ThemedText style={{ fontWeight: "bold" }}>{`${index + 1}、 ${item.title} \n`}</ThemedText>
+          <ThemedText style={{ fontSize: 12 }}>{`${item.writer.dynasty} *  ${item.writer.writername}`}</ThemedText>
+        </ThemedText>
+        {/* 右边区域，占三分之二宽度 */}
+        <ThemedText style={{ flex: 2, fontSize: 12 }}>
+          {`${previewContent} ... `}{" "}
+          <ThemedText
+            style={{
+              color: "blue",
+              fontSize: 12
+            }}
+            onPress={() => {
+              // 将 <br/> 标签替换为 \n
+              const fullContent = item.content ? item.content.replace(/<br\s*\/?>/gi, "\n") : "";
+              setSelectedContent(fullContent);
+              setModalVisible(true);
+            }}
+          >
+            {`>>>`}
+          </ThemedText>
+        </ThemedText>
+      </ThemedView>
+    );
+  };
 
   const renderFooter = () => {
     if (loading && hasMore) {
@@ -69,6 +97,21 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Modal 组件 */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <ThemedView style={styles.modalContainer}>
+          <ThemedText style={styles.modalTitle}>诗歌全文</ThemedText>
+          <ThemedText style={styles.modalContent}>{selectedContent}</ThemedText>
+          <Button title="关闭" onPress={() => setModalVisible(false)} />
+        </ThemedView>
+      </Modal>
       <ThemedView style={styles.title}>
         <Ionicons name="cellular-outline" size={24} color="#87CEEB" />
         {/* 显示诗歌总数 */}
@@ -110,5 +153,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flexDirection: "column",
     gap: 4
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10
+  },
+  modalContent: {
+    fontSize: 16,
+    marginBottom: 20
   }
 });

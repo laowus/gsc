@@ -31,7 +31,7 @@ const getPoetryByPage: (page: number, pageSize: number) => Promise<Poetry[]> = a
   // 计算偏移量
   const offset = (page - 1) * pageSize;
   const sql = `
-    select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title 
+    select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content 
     from Poetry p 
     join Writer w on p.writerid = w.writerid 
     order by p.poetryid desc 
@@ -43,7 +43,7 @@ const getPoetryByPage: (page: number, pageSize: number) => Promise<Poetry[]> = a
   for (const p of allRows as PoetryRow[]) {
     const writer = new Writer(p.writerid, p.writername, p.dynastyid);
     // 假设 Poetry 构造函数参数顺序与 PoetryRow 接口属性顺序一致
-    const _poetry = new Poetry(p.kindid, p.typeid, p.poetryid, writer, p.title);
+    const _poetry = new Poetry(p.kindid, p.typeid, p.poetryid, writer, p.title, p.content);
     poetryList.push(_poetry);
   }
   return poetryList;
