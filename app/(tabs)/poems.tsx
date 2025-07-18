@@ -1,27 +1,8 @@
-import { Platform, StyleSheet } from "react-native";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 
 export default function TabTwoScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">作品</ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+  return <ThemedText type="title">诗歌</ThemedText>;
 }
 
 const styles = StyleSheet.create({
@@ -29,10 +10,10 @@ const styles = StyleSheet.create({
     color: "#808080",
     bottom: -90,
     left: -35,
-    position: "absolute",
+    position: "absolute"
   },
   titleContainer: {
     flexDirection: "row",
-    gap: 8,
-  },
+    gap: 8
+  }
 });

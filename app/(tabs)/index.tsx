@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useRouter } from "expo-router";
 import PoetryDao from "@/dao/PoetryDao";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import { StyleSheet, FlatList, Modal, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [dbData, setDbData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,7 @@ export default function HomeScreen() {
     setLoading(true);
     try {
       const newData = await PoetryDao.getPoetryByPage(page, PAGE_SIZE);
+      console.log("newData:", newData);
       setDbData((prevData) => [...prevData, ...newData]);
       // 如果新数据数量小于 PAGE_SIZE，说明没有更多数据了
       setHasMore(newData.length === PAGE_SIZE);
@@ -71,10 +74,12 @@ export default function HomeScreen() {
               fontSize: 12
             }}
             onPress={() => {
-              // 将 <br/> 标签替换为 \n
-              const fullContent = item.content ? item.content.replace(/<br\s*\/?>/gi, "\n") : "";
-              setSelectedContent(fullContent);
-              setModalVisible(true);
+              // 导航到新的路由页面并传递 poetryid
+              console.log("传递的 poetryid:", item.poetryid);
+              router.push({
+                pathname: "/(modals)/poetryDetail",
+                params: { poetryid: item.poetryid }
+              });
             }}
           >
             {`>>>`}

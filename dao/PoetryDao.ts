@@ -31,7 +31,7 @@ const getPoetryByPage: (page: number, pageSize: number) => Promise<Poetry[]> = a
   // 计算偏移量
   const offset = (page - 1) * pageSize;
   const sql = `
-    select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content 
+    select p.poetryid, p.kindid, p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content 
     from Poetry p 
     join Writer w on p.writerid = w.writerid 
     order by p.poetryid desc 
@@ -39,11 +39,9 @@ const getPoetryByPage: (page: number, pageSize: number) => Promise<Poetry[]> = a
   `;
   const allRows = await db.getAllAsync(sql, [pageSize, offset]);
   const poetryList = [] as Poetry[];
-  // 明确 allRows 元素类型为 PoetryRow
   for (const p of allRows as PoetryRow[]) {
     const writer = new Writer(p.writerid, p.writername, p.dynastyid);
-    // 假设 Poetry 构造函数参数顺序与 PoetryRow 接口属性顺序一致
-    const _poetry = new Poetry(p.kindid, p.typeid, p.poetryid, writer, p.title, p.content);
+    const _poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
     poetryList.push(_poetry);
   }
   return poetryList;
@@ -70,8 +68,20 @@ const getTotalPoetryCount: () => Promise<number> = async () => {
   }
 };
 
+const getPoetryById: (poetryid: number) => Promise<Poetry> = async (poetryid) => {
+  const sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid where p.poetryid = ?`;
+  const p = (await db.getFirstAsync(sql, [poetryid])) as PoetryRow;
+  if (p) {
+    const writer = new Writer(p.writerid, p.writername, p.dynastyid);
+    const poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
+    return poetry;
+  }
+  return null;
+};
+
 export default {
   getAllPoetry,
   getPoetryByPage,
-  getTotalPoetryCount
+  getTotalPoetryCount,
+  getPoetryById
 };
