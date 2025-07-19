@@ -32,7 +32,6 @@ export default function HomeScreen() {
     setLoading(true);
     try {
       const newData = await PoetryDao.getPoetryByPage(page, PAGE_SIZE);
-      console.log("newData:", newData);
       setDbData((prevData) => [...prevData, ...newData]);
       // 如果新数据数量小于 PAGE_SIZE，说明没有更多数据了
       setHasMore(newData.length === PAGE_SIZE);

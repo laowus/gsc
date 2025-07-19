@@ -3,48 +3,15 @@ import { ThemedView } from "@/components/ThemedView";
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import PoetryDao from "@/dao/PoetryDao";
-import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import InfoDao from "@/dao/InfoDao";
+import { useEffect, useState, useRef } from "react";
+import { StyleSheet, Dimensions } from "react-native";
 import Poetry from "@/model/Poetry";
+import InfoTabs from "./infoTabs";
+import HtmlParser from "@/components/HtmlParser";
 
-// 处理 HTML 标签的函数
-const parseHtmlContent = (html: string) => {
-  // 先将 <br> 系列标签替换为换行符
-  const textWithLineBreaks = html.replace(/<br\s*\/?>/gi, "\n");
-  // 按换行符分割成段落
-  const paragraphs = textWithLineBreaks.split("\n");
-
-  return paragraphs.map((paragraph, index) => {
-    const parts: React.ReactNode[] = [];
-    let remaining = " ".repeat(8) + paragraph;
-    const emRegex = /<em>(.*?)<\/em>/gi;
-    let match;
-
-    while ((match = emRegex.exec(remaining)) !== null) {
-      const beforeEm = remaining.slice(0, match.index);
-      if (beforeEm) {
-        parts.push(beforeEm);
-      }
-      parts.push(
-        <Text key={parts.length} style={{ fontStyle: "italic" }}>
-          {match[1]}
-        </Text>
-      );
-      remaining = remaining.slice(match.index + match[0].length);
-    }
-
-    if (remaining) {
-      parts.push(remaining);
-    }
-
-    return (
-      <ThemedView key={index} style={styles.paragraph}>
-        {/* 直接在 ThemedText 上应用包含字体大小的样式 */}
-        <ThemedText style={[styles.paragraphText]}>{parts}</ThemedText>
-      </ThemedView>
-    );
-  });
-};
+// 获取屏幕高度
+const { height: screenHeight } = Dimensions.get("window");
 
 export default function PoetryDetail() {
   const params = useLocalSearchParams();
@@ -52,6 +19,7 @@ export default function PoetryDetail() {
   const [poetry, setPoetry] = useState<Poetry | null>(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const infoTabsRef = useRef<{ resetIndex: () => void }>(null);
 
   useEffect(() => {
     const fetchPoetryContent = async () => {
@@ -59,6 +27,8 @@ export default function PoetryDetail() {
         const _poetry = await PoetryDao.getPoetryById(poetryid);
         if (_poetry) {
           const updatedPoetry = { ..._poetry };
+          const infoList = await InfoDao.getInfosByIds(updatedPoetry.poetryid, 1);
+          updatedPoetry.infos = infoList;
           setPoetry(updatedPoetry);
           navigation.setOptions({ title: `${updatedPoetry.title} ` });
         }
@@ -74,6 +44,10 @@ export default function PoetryDetail() {
     };
 
     fetchPoetryContent();
+    // 当 poetryid 变化时，重置 infoTabs 的 index
+    if (infoTabsRef.current) {
+      infoTabsRef.current.resetIndex();
+    }
   }, [poetryid]);
 
   if (loading) {
@@ -93,19 +67,28 @@ export default function PoetryDetail() {
   }
 
   return (
-    <>
-      <ThemedView style={[styles.container, { alignItems: "center", justifyContent: "flex-start" }]}>
+    <ThemedView style={[styles.container, { flex: 1 }]}>
+      <ThemedView style={{ alignItems: "center", justifyContent: "flex-start" }}>
         <ThemedText style={styles.title}>{`(${poetry.writer.dynasty} ) ${poetry.writer.writername}`}</ThemedText>
-        {parseHtmlContent(poetry.content || "")}
+        <ThemedView style={{ maxHeight: screenHeight * 0.4, overflow: "scroll" }}>
+          <HtmlParser html={poetry.content || ""} fontSize={24} indent={8} />
+        </ThemedView>
       </ThemedView>
-    </>
+      {poetry.infos && (
+        <ThemedView style={{ flex: 1 }}>
+          <InfoTabs ref={infoTabsRef} poetry={poetry} />
+        </ThemedView>
+      )}
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    padding: 20,
+    flexDirection: "column",
+    justifyContent: "flex-start"
   },
   title: {
     fontSize: 12,
@@ -116,7 +99,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textAlign: "center"
   },
-  // 新增段落文字样式，设置字体大小
   paragraphText: {
     fontSize: 20
   }
