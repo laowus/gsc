@@ -5,13 +5,23 @@ import { useLocalSearchParams } from "expo-router";
 import PoetryDao from "@/dao/PoetryDao";
 import InfoDao from "@/dao/InfoDao";
 import { useEffect, useState, useRef } from "react";
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, Platform } from "react-native";
 import Poetry from "@/model/Poetry";
 import InfoTabs from "./infoTabs";
 import HtmlParser from "@/components/HtmlParser";
+import { ScrollView } from "react-native";
+import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
 
 // 获取屏幕高度
 const { height: screenHeight } = Dimensions.get("window");
+
+// 定义颜色常量
+const COLORS = {
+  primary: "#2c3e50",
+  secondary: "#7f8c8d",
+  background: "#ecf0f1",
+  text: "#2d3436"
+};
 
 export default function PoetryDetail() {
   const params = useLocalSearchParams();
@@ -30,7 +40,7 @@ export default function PoetryDetail() {
           const infoList = await InfoDao.getInfosByIds(updatedPoetry.poetryid, 1);
           updatedPoetry.infos = infoList;
           setPoetry(updatedPoetry);
-          navigation.setOptions({ title: `${updatedPoetry.title} ` });
+          navigation.setOptions({ title: `${updatedPoetry.title} (${updatedPoetry.kindname}) ` });
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -67,15 +77,15 @@ export default function PoetryDetail() {
   }
 
   return (
-    <ThemedView style={[styles.container, { flex: 1 }]}>
-      <ThemedView style={{ alignItems: "center", justifyContent: "flex-start" }}>
-        <ThemedText style={styles.title}>{`(${poetry.writer.dynasty} ) ${poetry.writer.writername}`}</ThemedText>
-        <ThemedView style={{ maxHeight: screenHeight * 0.4, overflow: "scroll" }}>
-          <HtmlParser html={poetry.content || ""} fontSize={24} indent={8} />
-        </ThemedView>
+    <ThemedView style={[styles.container, { backgroundColor: COLORS.background }]}>
+      <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} `}</ThemedText>
+      <ThemedView style={styles.contentContainer}>
+        <ScrollViewWithBackToTop>
+          <HtmlParser html={poetry.content || ""} fontSize={20} indent={poetry.kindname === "诗" ? 0 : 8} />
+        </ScrollViewWithBackToTop>
       </ThemedView>
       {poetry.infos && (
-        <ThemedView style={{ flex: 1 }}>
+        <ThemedView style={styles.infoTabsContainer}>
           <InfoTabs ref={infoTabsRef} poetry={poetry} />
         </ThemedView>
       )}
@@ -86,20 +96,43 @@ export default function PoetryDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 16,
     flexDirection: "column",
-    justifyContent: "flex-start"
+    justifyContent: "flex-start",
+    gap: 10
   },
-  title: {
-    fontSize: 12,
-    alignSelf: "flex-start"
+  writerInfo: {
+    fontSize: 14,
+    color: COLORS.primary,
+    fontWeight: "bold"
   },
-  paragraph: {
-    width: "100%",
-    marginBottom: 8,
-    textAlign: "center"
+  contentContainer: {
+    maxHeight: screenHeight * 0.4,
+    height: "auto",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    elevation: 4, // Android 阴影
+    shadowColor: COLORS.secondary, // iOS 阴影
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4
   },
-  paragraphText: {
-    fontSize: 20
+
+  poetryContent: {
+    color: COLORS.text,
+    lineHeight: 20
+  },
+  infoTabsContainer: {
+    flex: 1,
+    marginTop: 10,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    elevation: 4, // Android 阴影
+    shadowColor: COLORS.secondary, // iOS 阴影
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4
   }
 });

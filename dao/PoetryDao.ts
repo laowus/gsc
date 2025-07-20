@@ -34,7 +34,6 @@ const getPoetryByPage: (page: number, pageSize: number) => Promise<Poetry[]> = a
     select p.poetryid, p.kindid, p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content 
     from Poetry p 
     join Writer w on p.writerid = w.writerid 
-    order by p.poetryid desc 
     limit ? offset ?
   `;
   const allRows = await db.getAllAsync(sql, [pageSize, offset]);
