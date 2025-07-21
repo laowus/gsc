@@ -3,12 +3,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, ScrollView, TouchableOpacity, NativeSyntheticEvent } from "react-native";
+import { FlatList } from "react-native-reanimated/lib/typescript/Animated";
 export default function TabTwoScreen() {
   return (
     <SafeAreaView>
       <ThemedView style={styles.title}>
-        <Ionicons name="cellular-outline" size={24} color="#87CEEB" />
-        <ThemedText>全部</ThemedText>
+        <FlatList>
+          data={[{ key: 'Tab Two' }]}
+          renderItem={({ item }) => (
+            <ThemedText style={styles.title}>
+              <Ionicons name="ios-information-circle-outline" size={24} color="#87CEEB" />
+              {item.key}
+            </ThemedText>
+          )}
+          keyExtractor={item => item.key}
+        </FlatList>
       </ThemedView>
     </SafeAreaView>
   );

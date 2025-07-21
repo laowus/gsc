@@ -3,8 +3,8 @@ import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router";
 import PoetryDao from "@/dao/PoetryDao";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState, useRef } from "react";
-import { StyleSheet, Modal, Button, NativeSyntheticEvent } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, NativeSyntheticEvent, Platform, StatusBar, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // 引入 ScrollViewWithBackToTop 组件
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
@@ -97,16 +97,16 @@ export default function HomeScreen() {
     );
   };
 
-  const renderFooter = () => {
-    if (loading && hasMore) {
-      return (
-        <ThemedView style={{ paddingVertical: 20, borderTopWidth: 1, borderColor: "#CED0CE" }}>
-          <ThemedText>加载中...</ThemedText>
-        </ThemedView>
-      );
-    }
-    return null;
-  };
+  // const renderFooter = () => {
+  //   if (loading && hasMore) {
+  //     return (
+  //       <ThemedView style={{ paddingVertical: 20, borderTopWidth: 1, borderColor: "#CED0CE" }}>
+  //         <ThemedText>加载中...</ThemedText>
+  //       </ThemedView>
+  //     );
+  //   }
+  //   return null;
+  // };
 
   // 处理滚动事件，判断是否滚动到底部
   const handleScroll = (event: NativeSyntheticEvent<{ contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } }>) => {
@@ -129,7 +129,7 @@ export default function HomeScreen() {
       </ThemedView>
       <ScrollViewWithBackToTop onScroll={handleScroll} scrollEventThrottle={16} showThreshold={100}>
         {dbData.map((item, index) => renderItem({ item, index }))}
-        {renderFooter()}
+        {/* {renderFooter()} */}
       </ScrollViewWithBackToTop>
     </SafeAreaView>
   );
@@ -137,11 +137,11 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingLeft: 5,
-    paddingRight: 5,
+    paddingTop: 5,
     flex: 1,
     flexDirection: "column",
-    gap: 10
+    gap: 5,
+    marginBottom: 0
   },
   title: {
     fontSize: 24,

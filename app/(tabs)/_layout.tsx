@@ -1,11 +1,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-const TAB_BAR_HEIGHT = 60; // 定义 tabBar 高度
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -13,19 +9,20 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: false,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          default: {
-            height: TAB_BAR_HEIGHT // 设置 tabBar 高度
-          }
-        })
+        tabBarStyle: {
+          backgroundColor: colorScheme === "dark" ? "#121212" : "#FFFFFF",
+          borderTopWidth: 0,
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0
+        }
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+          headerShown: false,
           title: "首页",
           tabBarIcon: ({ color }) => <Ionicons name="home" size={28} color={color} />
         }}
@@ -34,6 +31,7 @@ export default function TabLayout() {
         name="types"
         options={{
           title: "分类",
+          headerShown: false,
           tabBarIcon: ({ color }) => <Ionicons name="calendar" size={28} color={color} />
         }}
       />
@@ -41,6 +39,7 @@ export default function TabLayout() {
         name="rhesis"
         options={{
           title: "名句",
+          headerShown: false,
           tabBarIcon: ({ color }) => <Ionicons name="star" size={28} color={color} />
         }}
       />
@@ -48,6 +47,7 @@ export default function TabLayout() {
         name="writers"
         options={{
           title: "诗人",
+          headerShown: false,
           tabBarIcon: ({ color }) => <Ionicons name="person" size={28} color={color} />
         }}
       />
@@ -55,6 +55,7 @@ export default function TabLayout() {
         name="poems"
         options={{
           title: "作品",
+          headerShown: false,
           tabBarIcon: ({ color }) => <Ionicons name="bag" size={28} color={color} />
         }}
       />
