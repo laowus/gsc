@@ -4,10 +4,10 @@ import { useRouter } from "expo-router";
 import PoetryDao from "@/dao/PoetryDao";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { StyleSheet, NativeSyntheticEvent, Platform, StatusBar, View } from "react-native";
+import { StyleSheet, NativeSyntheticEvent, Dimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
-import { useTabBarHeight } from "../(modals)/TabBarHeightContext";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -17,6 +17,10 @@ export default function HomeScreen() {
   const [hasMore, setHasMore] = useState(true); // 标记是否还有更多数据
   const PAGE_SIZE = 20;
   const [totalPoetryCount, setTotalPoetryCount] = useState<number | null>(null);
+  // 获取 TabBar 高度
+  const tabBarHeight = useBottomTabBarHeight();
+  // 获取屏幕高度
+  const screenHeight = Dimensions.get("window").height;
 
   useEffect(() => {
     loadData();
@@ -62,7 +66,6 @@ export default function HomeScreen() {
           {
             flexDirection: "row",
             gap: 15,
-            // 添加阴影效果
             elevation: 4,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
@@ -114,7 +117,6 @@ export default function HomeScreen() {
     const yOffset = contentOffset.y;
     const contentHeight = contentSize.height;
     const visibleHeight = layoutMeasurement.height;
-
     if (yOffset + visibleHeight >= contentHeight - 20 && hasMore && !loading) {
       loadData();
     }
@@ -124,9 +126,9 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.container]}>
       <ThemedView style={styles.title}>
         <Ionicons name="cellular-outline" size={24} color="#87CEEB" />
-        {/* 显示诗歌总数 */}
         <ThemedText>全部({totalPoetryCount !== null ? totalPoetryCount : "加载中..."})</ThemedText>
       </ThemedView>
+
       <ScrollViewWithBackToTop onScroll={handleScroll} scrollEventThrottle={16} showThreshold={100}>
         {dbData.map((item, index) => renderItem({ item, index }))}
         {/* {renderFooter()} */}
@@ -136,13 +138,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 5,
-    flex: 1,
-    flexDirection: "column",
-    gap: 5,
-    marginBottom: useTabBarHeight()
-  },
+  container: { flex: 1, gap: 5, padding: 10 },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -177,19 +173,8 @@ const styles = StyleSheet.create({
     color: "#007AFF",
     fontSize: 14
   },
-  modalContainer: {
+  poetryList: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10
-  },
-  modalContent: {
-    fontSize: 16,
-    marginBottom: 20
+    backgroundColor: "red"
   }
 });

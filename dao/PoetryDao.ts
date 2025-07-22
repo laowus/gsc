@@ -32,8 +32,8 @@ const getPoetryByPage: (page: number, pageSize: number) => Promise<Poetry[]> = a
   const offset = (page - 1) * pageSize;
   const sql = `
     select p.poetryid, p.kindid, p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content 
-    from Poetry p 
-    join Writer w on p.writerid = w.writerid 
+    from Poetry p
+    join Writer w on p.writerid = w.writerid  where p.poetryid < 10
     limit ? offset ?
   `;
   const allRows = await db.getAllAsync(sql, [pageSize, offset]);

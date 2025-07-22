@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Dimensions, View, Platform, ScrollView } from "react-native";
+import { StyleSheet, Dimensions, View, Platform, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import TypesDao from "@/dao/TypeDao";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 const { width } = Dimensions.get("window");
 const titleWidth = width / 5;
 const waterfallWidth = width - titleWidth;
+// 获取屏幕高度
 
 interface ParentType {
   typeid: number;
@@ -18,6 +20,9 @@ export default function Types() {
   const [parentTypes, setParentTypes] = useState<ParentType[]>([]);
   const [childTypes, setChildTypes] = useState<ParentType[]>([]);
   const [index, setIndex] = useState<number>(1);
+  const [marginBottom, setMarginBottom] = useState(40);
+  // 获取 TabBar 高度
+  const tabBarHeight = useBottomTabBarHeight();
 
   useEffect(() => {
     TypesDao.getChildTypes(0).then((res) => {
@@ -26,6 +31,8 @@ export default function Types() {
     TypesDao.getChildTypes(index).then((res) => {
       setChildTypes(res as ParentType[]);
     });
+    console.log("TabBar Height:", tabBarHeight);
+    setMarginBottom(tabBarHeight); // 设置底部间距为 TabBar 高度 + 20
   }, [index]);
 
   if (parentTypes.length === 0) {
@@ -49,7 +56,6 @@ export default function Types() {
       </ThemedView>
 
       <ThemedView style={[styles.waterfallContainer, { width: waterfallWidth }]}>
-        {/* 添加 ScrollView 组件 */}
         <ScrollView showsVerticalScrollIndicator={true}>
           <View style={styles.waterfallWrapper}>
             {childTypes.map((item) => (
@@ -66,12 +72,10 @@ export default function Types() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingTop: Platform.OS === "ios" ? 25 : StatusBar.currentHeight,
     flex: 1,
     flexDirection: "row",
-    gap: 16,
-    marginBottom: 0,
-    paddingTop: 5
+    gap: 16
   },
   titleContainer: {
     backgroundColor: "#ffffff",
@@ -106,7 +110,7 @@ const styles = StyleSheet.create({
   },
   waterfallContainer: {
     flex: 1,
-    padding: 16,
+    padding: 10,
     backgroundColor: "#ffffff",
     borderRadius: 16,
     ...Platform.select({

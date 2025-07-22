@@ -1,10 +1,7 @@
 import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { StyleSheet, ScrollView, TouchableOpacity, NativeSyntheticEvent } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useTabBarHeight } from "@/app/(modals)/TabBarHeightContext";
 
-const tabBarHeight = useTabBarHeight() + 20;
-console.log(tabBarHeight);
 // 定义 ScrollViewWithBackToTop 组件的 props 类型
 interface ScrollViewWithBackToTopProps extends React.ComponentProps<typeof ScrollView> {
   showThreshold?: number; // 显示返回顶部按钮的滚动阈值
@@ -56,7 +53,7 @@ const ScrollViewWithBackToTop = forwardRef<{ scrollTo: (options: { y: number; an
 const styles = StyleSheet.create({
   backToTopButton: {
     position: "absolute",
-    bottom: tabBarHeight,
+    bottom: 30,
     right: 20,
     elevation: 5,
     shadowColor: "#000",
