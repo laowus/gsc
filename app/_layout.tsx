@@ -1,8 +1,7 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { StyleSheet, ActivityIndicator, View, Text } from "react-native";
@@ -34,6 +33,7 @@ export default function RootLayout() {
   });
   const [isDatabaseLoaded, setIsDatabaseLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState<string | null>(null);
+  const router = useRouter();
 
   // 在组件挂载时检查数据库
   useEffect(() => {
@@ -41,6 +41,9 @@ export default function RootLayout() {
       try {
         const exist = await checkDatabaseFile();
         setIsDatabaseLoaded(exist);
+        router.push({
+          pathname: "/(tabs)/types"
+        });
       } catch (error) {
         console.error("数据库加载出错:", error);
         setLoadingError("数据库加载失败");

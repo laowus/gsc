@@ -6,8 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { StyleSheet, NativeSyntheticEvent, Platform, StatusBar, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-// 引入 ScrollViewWithBackToTop 组件
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
+import { useTabBarHeight } from "../(modals)/TabBarHeightContext";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -97,16 +97,16 @@ export default function HomeScreen() {
     );
   };
 
-  // const renderFooter = () => {
-  //   if (loading && hasMore) {
-  //     return (
-  //       <ThemedView style={{ paddingVertical: 20, borderTopWidth: 1, borderColor: "#CED0CE" }}>
-  //         <ThemedText>加载中...</ThemedText>
-  //       </ThemedView>
-  //     );
-  //   }
-  //   return null;
-  // };
+  const renderFooter = () => {
+    if (loading && hasMore) {
+      return (
+        <ThemedView style={{ paddingVertical: 20, borderTopWidth: 1, borderColor: "#CED0CE" }}>
+          <ThemedText>加载中...</ThemedText>
+        </ThemedView>
+      );
+    }
+    return null;
+  };
 
   // 处理滚动事件，判断是否滚动到底部
   const handleScroll = (event: NativeSyntheticEvent<{ contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } }>) => {
@@ -121,7 +121,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container]}>
       <ThemedView style={styles.title}>
         <Ionicons name="cellular-outline" size={24} color="#87CEEB" />
         {/* 显示诗歌总数 */}
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     gap: 5,
-    marginBottom: 0
+    marginBottom: useTabBarHeight()
   },
   title: {
     fontSize: 24,
