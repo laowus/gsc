@@ -1,36 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, NativeSyntheticEvent } from "react-native";
+import { StyleSheet, NativeSyntheticEvent, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router";
 import PoetryDao from "@/dao/PoetryDao";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
+import { useLocalSearchParams } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 // 只保留需要从外部传入的属性
 type PoetryListProps = {
   initialQueryParams?: Record<string, any>;
   pageSize?: number;
+  isNested?: boolean; // 新增属性，用于判断是否被嵌套
 };
 
-const PoetryList: React.FC<PoetryListProps> = ({ initialQueryParams = {}, pageSize = 20 }) => {
+const PoetryList: React.FC<PoetryListProps> = ({ initialQueryParams = {}, pageSize = 20, isNested = false }) => {
+  const params = useLocalSearchParams();
+  // 提取 writername 和 typename
+  const { writername, typename, ...restParams } = params;
+
   const router = useRouter();
   const [dbData, setDbData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [totalPoetryCount, setTotalPoetryCount] = useState<number | null>(null);
-  const [queryParams, setQueryParams] = useState(initialQueryParams);
+  const [queryParams, setQueryParams] = useState(restParams);
+  const navigation = useNavigation();
 
+  // 隐藏原生导航栏
   useEffect(() => {
+    navigation.setOptions({
+      headerShown: false
+    });
     loadData(queryParams);
-  }, [queryParams]);
+  }, [queryParams, navigation]);
 
   const loadData = async (params?: Record<string, any>) => {
     if (loading || !hasMore) return;
     setLoading(true);
     try {
       const { data, total } = await PoetryDao.getPoetryDataAndCount(page, pageSize, params);
-      setDbData((prevData) => [...prevData, ...data]);
+      if (page === 1) {
+        setDbData(data);
+      } else {
+        setDbData((prevData) => [...prevData, ...data]);
+      }
       setTotalPoetryCount(total);
       setHasMore(data.length === pageSize);
       setPage((prevPage) => prevPage + 1);
@@ -103,16 +120,29 @@ const PoetryList: React.FC<PoetryListProps> = ({ initialQueryParams = {}, pageSi
     return null;
   };
 
+  // 确定要显示的标题文本
+  let titleText = "";
+  if (typename) {
+    titleText = typename.toString();
+  } else if (writername) {
+    titleText = writername.toString();
+  }
+
   return (
-    <ThemedView>
-      <ThemedView style={styles.title}>
-        <ThemedText>全部({totalPoetryCount !== null ? totalPoetryCount : "加载中..."})</ThemedText>
+    <SafeAreaView style={{ flex: 1, gap: 5, padding: 10 }}>
+      <ThemedView style={[styles.title]}>
+        {!isNested && (
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <ThemedText style={styles.backButtonText}>←</ThemedText>
+          </TouchableOpacity>
+        )}
+        <ThemedText>{isNested ? `全部(${totalPoetryCount !== null ? totalPoetryCount : "加载中..."})` : `${titleText} (${totalPoetryCount !== null ? totalPoetryCount : "加载中..."})`} </ThemedText>
       </ThemedView>
       <ScrollViewWithBackToTop onScroll={handleScroll} scrollEventThrottle={16} showThreshold={100}>
         {dbData.map((item, index) => renderItem({ item, index }))}
         {renderFooter()}
       </ScrollViewWithBackToTop>
-    </ThemedView>
+    </SafeAreaView>
   );
 };
 
@@ -149,6 +179,12 @@ const styles = StyleSheet.create({
   readMoreText: {
     color: "#007AFF",
     fontSize: 14
+  },
+  // 新增返回按钮样式
+  backButtonText: {
+    fontSize: 18,
+    color: "#007AFF",
+    marginRight: 10
   }
 });
 

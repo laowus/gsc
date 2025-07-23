@@ -37,14 +37,22 @@ const getPoetryDataAndCount: (page: number, pageSize: number, params?: Record<st
   const offset = (page - 1) * pageSize;
   let whereClause = "where 1=1";
   const values: any[] = [pageSize, offset];
-
+  console.log("getPoetryDataAndCount params:", params);
   // 根据查询条件构建 where 子句
   if (Object.keys(params).length > 0) {
     const conditions = Object.entries(params).map(([key, value]) => {
-      values.push(value);
-      return `${key} = ?`;
+      if (key === "typeid") {
+        // 针对 typeid 使用 LIKE 查询
+        values.push(`%${value}%`);
+        return `${key} LIKE '${value},%' OR ${key} LIKE '%,${value},%' OR ${key} LIKE '%,${value}' OR ${key} = '${value}'`;
+      } else {
+        values.push(value);
+        return `${key} = ${value}`;
+      }
     });
     whereClause = `where ${conditions.join(" AND ")}`;
+
+    console.log("whereClause:", whereClause);
   }
 
   // 分页查询 SQL
@@ -56,8 +64,11 @@ const getPoetryDataAndCount: (page: number, pageSize: number, params?: Record<st
     limit ? offset ?
   `;
 
+  console.log("dataSql:", dataSql);
+
   // 总数查询 SQL
   const countSql = `SELECT COUNT(*) as total FROM Poetry p join Writer w on p.writerid = w.writerid ${whereClause}`;
+  console.log("countSql:", countSql);
   const countValues = [...values.slice(2)]; // 移除 limit 和 offset 参数
 
   try {
@@ -65,6 +76,7 @@ const getPoetryDataAndCount: (page: number, pageSize: number, params?: Record<st
     const [allRows, countResult] = await Promise.all([db.getAllAsync(dataSql, values), db.getFirstAsync(countSql, countValues)]);
 
     const poetryList = [] as Poetry[];
+
     for (const p of allRows as PoetryRow[]) {
       const writer = new Writer(p.writerid, p.writername, p.dynastyid);
       const _poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);

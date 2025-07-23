@@ -4,7 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import TypesDao from "@/dao/TypeDao";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
@@ -61,7 +60,7 @@ export default function Types() {
                   onPress={() => {
                     router.push({
                       pathname: "/poetryList",
-                      params: { poetryid: item.typeid }
+                      params: { typeid: item.typeid, typename: item.typename }
                     });
                   }}
                 >
