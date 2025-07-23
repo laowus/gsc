@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Dimensions, View, Platform, ScrollView, StatusBar } from "react-native";
+import { StyleSheet, Dimensions, View, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import TypesDao from "@/dao/TypeDao";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 const titleWidth = width / 5;
@@ -20,9 +21,6 @@ export default function Types() {
   const [parentTypes, setParentTypes] = useState<ParentType[]>([]);
   const [childTypes, setChildTypes] = useState<ParentType[]>([]);
   const [index, setIndex] = useState<number>(1);
-  const [marginBottom, setMarginBottom] = useState(40);
-  // 获取 TabBar 高度
-  const tabBarHeight = useBottomTabBarHeight();
 
   useEffect(() => {
     TypesDao.getChildTypes(0).then((res) => {
@@ -31,8 +29,6 @@ export default function Types() {
     TypesDao.getChildTypes(index).then((res) => {
       setChildTypes(res as ParentType[]);
     });
-    console.log("TabBar Height:", tabBarHeight);
-    setMarginBottom(tabBarHeight); // 设置底部间距为 TabBar 高度 + 20
   }, [index]);
 
   if (parentTypes.length === 0) {
@@ -60,7 +56,17 @@ export default function Types() {
           <View style={styles.waterfallWrapper}>
             {childTypes.map((item) => (
               <ThemedView key={item.typeid} style={styles.waterfallItem}>
-                <ThemedText style={styles.itemText}>{item.typename}</ThemedText>
+                <ThemedText
+                  style={styles.itemText}
+                  onPress={() => {
+                    router.push({
+                      pathname: "/poetryList",
+                      params: { poetryid: item.typeid }
+                    });
+                  }}
+                >
+                  {item.typename}
+                </ThemedText>
               </ThemedView>
             ))}
           </View>
@@ -72,7 +78,7 @@ export default function Types() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: Platform.OS === "ios" ? 25 : StatusBar.currentHeight,
+    padding: 10,
     flex: 1,
     flexDirection: "row",
     gap: 16

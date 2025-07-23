@@ -5,11 +5,10 @@ import { useLocalSearchParams } from "expo-router";
 import PoetryDao from "@/dao/PoetryDao";
 import InfoDao from "@/dao/InfoDao";
 import { useEffect, useState, useRef } from "react";
-import { StyleSheet, Dimensions, Platform } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import Poetry from "@/model/Poetry";
 import InfoTabs from "./infoTabs";
 import HtmlParser from "@/components/HtmlParser";
-import { ScrollView } from "react-native";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
 
 // 获取屏幕高度

@@ -27,23 +27,61 @@ const getAllPoetry: () => Promise<Poetry[]> = async () => {
   }
   return poetryList;
 }; // 分页查询诗歌的方法
-const getPoetryByPage: (page: number, pageSize: number) => Promise<Poetry[]> = async (page, pageSize) => {
-  // 计算偏移量
+const getPoetryByPage: (page: number, pageSize: number, params?: Record<string, any>) => Promise<Poetry[]> = async (page, pageSize, params = {}) => {
+  const { data } = await getPoetryDataAndCount(page, pageSize, params);
+  return data;
+};
+
+// 同时获取分页数据和符合条件的总数
+const getPoetryDataAndCount: (page: number, pageSize: number, params?: Record<string, any>) => Promise<{ data: Poetry[]; total: number }> = async (page, pageSize, params = {}) => {
   const offset = (page - 1) * pageSize;
-  const sql = `
+  let whereClause = "where 1=1";
+  const values: any[] = [pageSize, offset];
+
+  // 根据查询条件构建 where 子句
+  if (Object.keys(params).length > 0) {
+    const conditions = Object.entries(params).map(([key, value]) => {
+      values.push(value);
+      return `${key} = ?`;
+    });
+    whereClause = `where ${conditions.join(" AND ")}`;
+  }
+
+  // 分页查询 SQL
+  const dataSql = `
     select p.poetryid, p.kindid, p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content 
     from Poetry p
-    join Writer w on p.writerid = w.writerid  where p.poetryid < 10
+    join Writer w on p.writerid = w.writerid 
+    ${whereClause}
     limit ? offset ?
   `;
-  const allRows = await db.getAllAsync(sql, [pageSize, offset]);
-  const poetryList = [] as Poetry[];
-  for (const p of allRows as PoetryRow[]) {
-    const writer = new Writer(p.writerid, p.writername, p.dynastyid);
-    const _poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
-    poetryList.push(_poetry);
+
+  // 总数查询 SQL
+  const countSql = `SELECT COUNT(*) as total FROM Poetry p join Writer w on p.writerid = w.writerid ${whereClause}`;
+  const countValues = [...values.slice(2)]; // 移除 limit 和 offset 参数
+
+  try {
+    // 并发执行查询
+    const [allRows, countResult] = await Promise.all([db.getAllAsync(dataSql, values), db.getFirstAsync(countSql, countValues)]);
+
+    const poetryList = [] as Poetry[];
+    for (const p of allRows as PoetryRow[]) {
+      const writer = new Writer(p.writerid, p.writername, p.dynastyid);
+      const _poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
+      poetryList.push(_poetry);
+    }
+
+    return {
+      data: poetryList,
+      total: (countResult as { total: number }).total
+    };
+  } catch (error) {
+    console.error("获取数据和总数时出错:", error);
+    return {
+      data: [],
+      total: 0
+    };
   }
-  return poetryList;
 };
 // 定义查询结果的类型
 interface CountResult {
@@ -51,7 +89,6 @@ interface CountResult {
 }
 // 获取所有 Poetry 的数量
 const getTotalPoetryCount: () => Promise<number> = async () => {
-  console.log("getTotalPoetryCount 方法开始执行");
   try {
     // 使用 await 等待异步操作完成
     const result: CountResult = await db.getFirstAsync("SELECT COUNT(*) as total FROM Poetry");
@@ -77,10 +114,65 @@ const getPoetryById: (poetryid: number) => Promise<Poetry> = async (poetryid) =>
   }
   return null;
 };
-
+// 根据作者查询诗歌
+const getPoetryByWriter: (writerid: number) => Promise<Poetry[]> = async (writerid) => {
+  const sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid where w.writerid = ?`;
+  const allRows = await db.getAllAsync(sql, [writerid]);
+  const poetryList = [] as Poetry[];
+  for (const p of allRows as PoetryRow[]) {
+    const writer = new Writer(p.writerid, p.writername, p.dynastyid);
+    const poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
+    poetryList.push(poetry);
+  }
+  return poetryList;
+};
+// 根据分类查询诗歌
+const getPoetryByTid: (typeid: string) => Promise<Poetry[]> = async (typeid) => {
+  const sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid where p.typeid = ?`;
+  const allRows = await db.getAllAsync(sql, [typeid]);
+  const poetryList = [] as Poetry[];
+  for (const p of allRows as PoetryRow[]) {
+    const writer = new Writer(p.writerid, p.writername, p.dynastyid);
+    const poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
+    poetryList.push(poetry);
+  }
+  return poetryList;
+};
+// 根据体裁查询诗歌
+const getPoetryByKid: (kindid: number) => Promise<Poetry[]> = async (kindid) => {
+  const sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid where p.kindid = ?`;
+  const allRows = await db.getAllAsync(sql, [kindid]);
+  const poetryList = [] as Poetry[];
+  for (const p of allRows as PoetryRow[]) {
+    const writer = new Writer(p.writerid, p.writername, p.dynastyid);
+    const poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
+    poetryList.push(poetry);
+  }
+  return poetryList;
+};
+// 关键字查询
+const getPoetryBySearch: (keyword: string) => Promise<Poetry[]> = async (keyword) => {
+  const sql = `
+        select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,
+				p.title,p.content from Poetry p join Writer w on p.writerid = w.writerid where 
+				p.title like '%${keyword}%' or w.writername like '%${keyword}%' or p.content like '%${keyword}%'`;
+  const allRows = await db.getAllAsync(sql, [`%${keyword}%`]);
+  const poetryList = [] as Poetry[];
+  for (const p of allRows as PoetryRow[]) {
+    const writer = new Writer(p.writerid, p.writername, p.dynastyid);
+    const poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
+    poetryList.push(poetry);
+  }
+  return poetryList;
+};
 export default {
   getAllPoetry,
   getPoetryByPage,
   getTotalPoetryCount,
-  getPoetryById
+  getPoetryById,
+  getPoetryBySearch,
+  getPoetryByWriter,
+  getPoetryByTid,
+  getPoetryByKid,
+  getPoetryDataAndCount
 };
