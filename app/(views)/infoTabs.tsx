@@ -39,17 +39,15 @@ const InfoTabs = forwardRef<{ resetIndex: () => void }, InfoTabsProps>(({ poetry
 
   return (
     <ThemedView style={[styles.infoTabsContainer]}>
-      <ThemedView>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.titleScrollView}>
-          <ThemedView style={styles.titleContainer}>
-            {infoList.map((info, infoIndex) => (
-              <ThemedText key={info.infoid} onPress={() => setIndex(infoIndex)} style={[styles.tabText, infoIndex === index && styles.activeTabText]}>
-                {info.title}
-              </ThemedText>
-            ))}
-          </ThemedView>
-        </ScrollView>
-      </ThemedView>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <ThemedView style={styles.titleContainer}>
+          {infoList.map((info, infoIndex) => (
+            <ThemedText key={info.infoid} onPress={() => setIndex(infoIndex)} style={[styles.tabText, infoIndex === index && styles.activeTabText]}>
+              {info.title}
+            </ThemedText>
+          ))}
+        </ThemedView>
+      </ScrollView>
 
       {infoList[index] && (
         <ScrollViewWithBackToTop ref={scrollViewRef} style={[styles.scrollView, { marginTop: 10 }]} showsVerticalScrollIndicator={false}>
@@ -63,15 +61,11 @@ const InfoTabs = forwardRef<{ resetIndex: () => void }, InfoTabsProps>(({ poetry
 const styles = StyleSheet.create({
   infoTabsContainer: {
     flex: 1,
-    padding: 0, // 移除所有内边距，让内容更紧凑
     backgroundColor: "#f9f9f9" // 浅灰色背景
   },
-  titleScrollView: {
-    marginBottom: 5, // 移除底部外边距
-    marginHorizontal: 0 // 移除左右外边距
-  },
+
   titleContainer: {
-    height: 35,
+    height: 30,
     flexDirection: "row",
     gap: 10,
     backgroundColor: "#ffffff", // 白色背景
@@ -80,19 +74,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    // 防止换行
     flexWrap: "nowrap"
   },
   tabText: {
-    flexShrink: 0, // 防止标签被压缩
-    // 减小垂直内边距
+    flexShrink: 0,
     paddingVertical: 8,
     paddingHorizontal: 16,
     textAlign: "center",
     borderRadius: 6,
-    fontSize: 16,
-    color: "#666666" // 深灰色文字
-    //transition: "background-color 0.3s ease" // 过渡动画
+    fontSize: 12,
+    color: "#666666", // 深灰色文字
+    height: 30, // 确保文本垂直居中
+    lineHeight: 14 // 大致等于 fontSize
   },
   activeTabText: {
     backgroundColor: "#4a90e2", // 漂亮的蓝色
@@ -102,8 +95,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    // 保持与 tabText 一致的垂直内边距
-    paddingVertical: 8
+    paddingVertical: 8,
+    fontSize: 12
   },
   scrollView: {
     backgroundColor: "#ffffff", // 白色背景
@@ -113,7 +106,6 @@ const styles = StyleSheet.create({
     shadowColor: "#000", // iOS 阴影
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    height: "auto",
     marginTop: 5 // 确保垂直 ScrollView 顶部没有间距
   },
   backToTopButton: {
@@ -131,7 +123,7 @@ const styles = StyleSheet.create({
   },
   backToTopText: {
     color: "#ffffff",
-    fontSize: 14
+    fontSize: 12
   }
 });
 

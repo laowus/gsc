@@ -12,6 +12,7 @@ class Poetry {
   title: string; //标题
   content?: string; //内容
   infos?: Info[]; //诗词简介
+  typename: ReactNode;
   constructor(poetryid: number, typeid: string, kindid: number, writer: Writer, title: string, content?: string, infos?: Info[]) {
     this.poetryid = poetryid;
     this.typeid = typeid;
