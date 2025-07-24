@@ -1,16 +1,15 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useNavigation } from "@react-navigation/native";
-import { useLocalSearchParams } from "expo-router";
-import PoetryDao from "@/dao/PoetryDao";
 import InfoDao from "@/dao/InfoDao";
 import { useEffect, useState, useRef } from "react";
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, TouchableOpacity } from "react-native";
 import Poetry from "@/model/Poetry";
 import InfoTabs from "./infoTabs";
 import HtmlParser from "@/components/HtmlParser";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
 import TypeDao from "@/dao/TypeDao";
+import usePoetryStore from "../../store/poetryStore";
 
 // 获取屏幕高度
 const { height: screenHeight } = Dimensions.get("window");
@@ -28,49 +27,47 @@ type TypeName = {
   typename: string;
 };
 
-export default function PoetryDetail() {
-  const params = useLocalSearchParams();
-  const poetryid = typeof params.poetryid === "string" ? parseInt(params.poetryid, 10) : NaN;
-  const [poetry, setPoetry] = useState<Poetry | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [typeNames, setTypeNames] = useState<string[]>([]);
+// 定义组件的 props 类型，接收 Poetry 实体
+type PoetryDetailProps = {
+  poetry: Poetry;
+};
+
+export default function PoetryDetail({ poetry }: PoetryDetailProps) {
   const navigation = useNavigation();
   const infoTabsRef = useRef<{ resetIndex: () => void }>(null);
+  const [typeNames, setTypeNames] = useState<string[]>([]);
+  const [updatedPoetry, setUpdatedPoetry] = useState<Poetry>(poetry);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPoetryContent = async () => {
+    navigation.setOptions({
+      headerShown: false
+    });
+    const fetchAdditionalInfo = async () => {
       try {
-        const _poetry = await PoetryDao.getPoetryById(poetryid);
-        if (_poetry) {
-          const updatedPoetry = { ..._poetry };
-          const infoList = await InfoDao.getInfosByIds(updatedPoetry.poetryid, 1);
-          updatedPoetry.infos = infoList;
-          setPoetry(updatedPoetry);
-          navigation.setOptions({ title: `${updatedPoetry.title} (${updatedPoetry.kindname}) ` });
+        const infoList = await InfoDao.getInfosByIds(poetry.poetryid, 1);
+        const updated = { ...poetry, infos: infoList };
+        setUpdatedPoetry(updated);
 
-          // 调用 TypeDao 方法获取类型名称
-          const typeNames: TypeName[] = (await TypeDao.getTypeNamByIds(updatedPoetry.typeid)) as TypeName[];
-          // 提取 typename 字段并设置到状态中
-          const names = typeNames.map((item) => item.typename);
-          setTypeNames(names);
-        }
+        const typeNames: TypeName[] = (await TypeDao.getTypeNamByIds(updated.typeid)) as TypeName[];
+        const names = typeNames.map((item) => item.typename);
+        setTypeNames(names);
       } catch (error) {
         if (error instanceof Error) {
-          console.error("获取诗歌内容时出错:", error.message);
+          console.error("获取额外信息时出错:", error.message);
         } else {
-          console.error("获取诗歌内容时出错: 未知错误", error);
+          console.error("获取额外信息时出错: 未知错误", error);
         }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPoetryContent();
-    // 当 poetryid 变化时，重置 infoTabs 的 index
+    fetchAdditionalInfo();
     if (infoTabsRef.current) {
       infoTabsRef.current.resetIndex();
     }
-  }, [poetryid]);
+  }, [poetry.poetryid]);
 
   if (loading) {
     return (
@@ -80,28 +77,27 @@ export default function PoetryDetail() {
     );
   }
 
-  if (!poetry) {
-    return (
-      <ThemedView style={styles.container}>
-        <ThemedText>未找到诗歌内容</ThemedText>
-      </ThemedView>
-    );
-  }
-
   return (
     <ThemedView style={[styles.container, { backgroundColor: COLORS.background }]}>
+      {/* <ThemedView style={styles.title}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <ThemedText style={styles.backButtonText}>←</ThemedText>
+        </TouchableOpacity>
+        <ThemedText>{updatedPoetry.title}</ThemedText>
+      </ThemedView> */}
+
       <ThemedView style={styles.writerInfoContainer}>
-        <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} `}</ThemedText>
+        <ThemedText style={styles.writerInfo}>{`${updatedPoetry.writer.dynasty} * ${updatedPoetry.writer.writername} `}</ThemedText>
         <ThemedText style={styles.typeIdText}>{typeNames.join(" / ")}</ThemedText>
       </ThemedView>
       <ThemedView style={styles.contentContainer}>
         <ScrollViewWithBackToTop>
-          <HtmlParser html={poetry.content || ""} fontSize={20} indent={poetry.kindname === "诗" ? 0 : 8} />
+          <HtmlParser html={updatedPoetry.content || ""} fontSize={20} indent={updatedPoetry.kindname === "诗" ? 0 : 8} />
         </ScrollViewWithBackToTop>
       </ThemedView>
-      {poetry.infos && (
+      {updatedPoetry.infos && (
         <ThemedView style={styles.infoTabsContainer}>
-          <InfoTabs ref={infoTabsRef} poetry={poetry} />
+          <InfoTabs ref={infoTabsRef} poetry={updatedPoetry} />
         </ThemedView>
       )}
     </ThemedView>
@@ -109,34 +105,60 @@ export default function PoetryDetail() {
 }
 
 const styles = StyleSheet.create({
+  // 样式保持不变
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    padding: 14,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
+  },
+  noTitle: {
+    // 确保 flex 布局
+    flexDirection: "row",
+    // 让元素均匀分布
+    justifyContent: "space-between",
+    alignItems: "center",
+    fontSize: 24,
+    fontWeight: "bold",
+    padding: 14,
+    borderRadius: 8,
+    gap: 10
+  },
   container: {
     flex: 1,
-    padding: 16,
+    top: 20,
+    padding: 20,
     flexDirection: "column",
     justifyContent: "flex-start",
     gap: 10
   },
-  // 美化 writerInfoContainer 样式
+  backButtonText: {
+    fontSize: 18,
+    color: "#007AFF",
+    marginRight: 10
+  },
   writerInfoContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#ffffff", // 设置白色背景
-    borderRadius: 8, // 添加圆角
-    padding: 12, // 添加内边距
-    elevation: 3, // Android 阴影
-    shadowColor: "#000", // iOS 阴影颜色
-    shadowOffset: { width: 0, height: 2 }, // iOS 阴影偏移量
-    shadowOpacity: 0.15, // iOS 阴影透明度
-    shadowRadius: 3, // iOS 阴影模糊半径
-    marginBottom: 10 // 添加底部外边距
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    padding: 12,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    marginBottom: 10
   },
   writerInfo: {
     fontSize: 14,
     color: COLORS.primary,
     fontWeight: "bold"
   },
-  // 新增 typeIdText 样式
   typeIdText: {
     fontSize: 14,
     color: COLORS.primary,
@@ -149,35 +171,33 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
-    elevation: 4, // Android 阴影
-    shadowColor: COLORS.secondary, // iOS 阴影
+    elevation: 4,
+    shadowColor: COLORS.secondary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4
   },
-
   poetryContent: {
     color: COLORS.text,
     lineHeight: 20
   },
   like: {
-    backgroundColor: "#fff", // 设置背景颜色
-    borderRadius: 12, // 添加圆角
-    padding: 16, // 添加内边距
-    elevation: 4, // Android 阴影
-    shadowColor: COLORS.secondary, // iOS 阴影
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    elevation: 4,
+    shadowColor: COLORS.secondary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    overflow: "hidden", // 隐藏溢出内容
-    marginTop: 10 // 添加顶部外边距
+    overflow: "hidden",
+    marginTop: 10
   },
   likeText: {
-    color: COLORS.text, // 设置文字颜色
-    fontSize: 16, // 设置文字大小
-    fontWeight: "bold", // 设置文字加粗
-    textOverflow: "ellipsis" // 溢出内容显示省略号
-    //whiteSpace: 'nowrap', // 强制内容在一行显示
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: "bold",
+    textOverflow: "ellipsis"
   },
   infoTabsContainer: {
     flex: 1,
@@ -185,8 +205,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 10,
-    elevation: 4, // Android 阴影
-    shadowColor: COLORS.secondary, // iOS 阴影
+    elevation: 4,
+    shadowColor: COLORS.secondary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,

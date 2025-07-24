@@ -1,19 +1,5 @@
-import { StyleSheet } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
+import PoetryList from "@/app/(views)/poetryList";
 
-export default function TabTwoScreen() {
-  return <ThemedText type="title">诗歌</ThemedText>;
+export default function HomeScreen() {
+  return <PoetryList isNested={true} />;
 }
-
-const styles = StyleSheet.create({
-  headerImage: {
-    color: "#808080",
-    bottom: -90,
-    left: -35,
-    position: "absolute"
-  },
-  titleContainer: {
-    flexDirection: "row",
-    gap: 8
-  }
-});

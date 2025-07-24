@@ -42,7 +42,7 @@ export default function RootLayout() {
         const exist = await checkDatabaseFile();
         setIsDatabaseLoaded(exist);
         router.push({
-          pathname: "/(tabs)/types"
+          pathname: "/(tabs)"
         });
       } catch (error) {
         console.error("数据库加载出错:", error);

@@ -90,7 +90,19 @@ const getPoetryById: (poetryid: number) => Promise<Poetry> = async (poetryid) =>
   return null;
 };
 
+const getFirstPoetry: () => Promise<Poetry> = async () => {
+  const sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid order by p.poetryid limit 1`;
+  const p = (await db.getFirstAsync(sql, [])) as PoetryRow;
+  if (p) {
+    const writer = new Writer(p.writerid, p.writername, p.dynastyid);
+    const poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
+    return poetry;
+  }
+  return null;
+};
+
 export default {
   getPoetryById,
-  getPoetryDataAndCount
+  getPoetryDataAndCount,
+  getFirstPoetry
 };
