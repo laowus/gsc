@@ -1,15 +1,12 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useNavigation } from "@react-navigation/native";
-import InfoDao from "@/dao/InfoDao";
 import { useEffect, useState, useRef } from "react";
-import { StyleSheet, Dimensions, TouchableOpacity } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import Poetry from "@/model/Poetry";
 import InfoTabs from "./infoTabs";
 import HtmlParser from "@/components/HtmlParser";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
 import TypeDao from "@/dao/TypeDao";
-import usePoetryStore from "../../store/poetryStore";
 
 // 获取屏幕高度
 const { height: screenHeight } = Dimensions.get("window");
@@ -27,46 +24,29 @@ type TypeName = {
   typename: string;
 };
 
-// 定义组件的 props 类型，接收 Poetry 实体
-type PoetryDetailProps = {
-  poetry: Poetry;
-};
-
-export default function PoetryDetail({ poetry }: PoetryDetailProps) {
-  const navigation = useNavigation();
-  const infoTabsRef = useRef<{ resetIndex: () => void }>(null);
+// 传递一个poetry: Poetry 实体对象
+export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
   const [typeNames, setTypeNames] = useState<string[]>([]);
-  const [updatedPoetry, setUpdatedPoetry] = useState<Poetry>(poetry);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: false
-    });
-    const fetchAdditionalInfo = async () => {
+    const fetchTypeNames = async () => {
       try {
-        const infoList = await InfoDao.getInfosByIds(poetry.poetryid, 1);
-        const updated = { ...poetry, infos: infoList };
-        setUpdatedPoetry(updated);
-
-        const typeNames: TypeName[] = (await TypeDao.getTypeNamByIds(updated.typeid)) as TypeName[];
+        const typeNames: TypeName[] = (await TypeDao.getTypeNamByIds(poetry.typeid)) as TypeName[];
         const names = typeNames.map((item) => item.typename);
         setTypeNames(names);
       } catch (error) {
         if (error instanceof Error) {
-          console.error("获取额外信息时出错:", error.message);
+          console.error("获取类型名称时出错:", error.message);
         } else {
-          console.error("获取额外信息时出错: 未知错误", error);
+          console.error("获取类型名称时出错: 未知错误", error);
         }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAdditionalInfo();
-    if (infoTabsRef.current) {
-      infoTabsRef.current.resetIndex();
-    }
+    fetchTypeNames();
   }, [poetry.poetryid]);
 
   if (loading) {
@@ -79,27 +59,18 @@ export default function PoetryDetail({ poetry }: PoetryDetailProps) {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: COLORS.background }]}>
-      {/* <ThemedView style={styles.title}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <ThemedText style={styles.backButtonText}>←</ThemedText>
-        </TouchableOpacity>
-        <ThemedText>{updatedPoetry.title}</ThemedText>
-      </ThemedView> */}
-
       <ThemedView style={styles.writerInfoContainer}>
-        <ThemedText style={styles.writerInfo}>{`${updatedPoetry.writer.dynasty} * ${updatedPoetry.writer.writername} `}</ThemedText>
+        <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} `}</ThemedText>
         <ThemedText style={styles.typeIdText}>{typeNames.join(" / ")}</ThemedText>
       </ThemedView>
       <ThemedView style={styles.contentContainer}>
         <ScrollViewWithBackToTop>
-          <HtmlParser html={updatedPoetry.content || ""} fontSize={20} indent={updatedPoetry.kindname === "诗" ? 0 : 8} />
+          <HtmlParser html={poetry.content || ""} fontSize={20} indent={poetry.kindname === "诗" ? 0 : 8} />
         </ScrollViewWithBackToTop>
       </ThemedView>
-      {updatedPoetry.infos && (
-        <ThemedView style={styles.infoTabsContainer}>
-          <InfoTabs ref={infoTabsRef} poetry={updatedPoetry} />
-        </ThemedView>
-      )}
+      <ThemedView style={styles.infoTabsContainer}>
+        <InfoTabs poetryid={poetry.poetryid} />
+      </ThemedView>
     </ThemedView>
   );
 }

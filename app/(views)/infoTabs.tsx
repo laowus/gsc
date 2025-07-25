@@ -5,16 +5,33 @@ import Poetry from "@/model/Poetry";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
 import HtmlParser from "@/components/HtmlParser";
 import { StyleSheet, ScrollView } from "react-native";
+import Info from "@/model/Info";
+import InfoDao from "@/dao/InfoDao";
 
-// 定义 InfoTabs 组件的 props 类型
-interface InfoTabsProps {
-  poetry: Poetry;
-}
-
-const InfoTabs = forwardRef<{ resetIndex: () => void }, InfoTabsProps>(({ poetry }, ref) => {
+const InfoTabs = ({ poetryid }: { poetryid: number }) => {
   const [index, setIndex] = useState(0);
-  const infoList = poetry.infos || [];
+  const [infoList, setInfoList] = useState<Info[]>([]);
+  const [loading, setLoading] = useState(true);
   const scrollViewRef = useRef<{ scrollTo: (options: { y: number; animated?: boolean }) => void }>(null);
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      try {
+        const info = await InfoDao.getInfosByIds(poetryid, 1);
+        setInfoList(info);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error("获取额外信息时出错:", error.message);
+        } else {
+          console.error("获取额外信息时出错: 未知错误", error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInfo();
+  }, [poetryid]);
 
   useEffect(() => {
     setIndex(infoList.length - 1);
@@ -23,19 +40,12 @@ const InfoTabs = forwardRef<{ resetIndex: () => void }, InfoTabsProps>(({ poetry
   // 每次 poetry 变化或组件挂载时，将 index 设置为 0
   useEffect(() => {
     setIndex(0);
-  }, [poetry]);
+  }, [poetryid]);
 
   // 监听 infoList[index] 变化，滚动到顶部
   useEffect(() => {
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   }, [infoList[index]]);
-
-  // 暴露重置 index 的方法
-  useImperativeHandle(ref, () => ({
-    resetIndex: () => {
-      setIndex(0);
-    }
-  }));
 
   return (
     <ThemedView style={[styles.infoTabsContainer]}>
@@ -56,7 +66,7 @@ const InfoTabs = forwardRef<{ resetIndex: () => void }, InfoTabsProps>(({ poetry
       )}
     </ThemedView>
   );
-});
+};
 
 const styles = StyleSheet.create({
   infoTabsContainer: {
@@ -128,3 +138,6 @@ const styles = StyleSheet.create({
 });
 
 export default InfoTabs;
+function setLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}
