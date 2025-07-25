@@ -12,8 +12,15 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={{ flex: 1, gap: 5, padding: 10 }}>
       <ThemedView style={[styles.title]}>
+        <TouchableOpacity>
+          <ThemedText style={styles.backButtonText}>←</ThemedText>
+        </TouchableOpacity>
         <ThemedText>{currentPoetry.title}</ThemedText>
+        <TouchableOpacity>
+          <ThemedText style={styles.backButtonText}> →</ThemedText>
+        </TouchableOpacity>
       </ThemedView>
+
       <PoetryDetail poetry={currentPoetry} />
     </SafeAreaView>
   );
@@ -26,7 +33,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
-    gap: 10
+    gap: 10,
+    justifyContent: "space-between"
   }, // 新增返回按钮样式
   backButtonText: {
     fontSize: 18,
