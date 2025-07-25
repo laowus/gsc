@@ -88,7 +88,7 @@ const PoetryList: React.FC<PoetryListProps> = ({ initialQueryParams = {}, pageSi
             onPress={() => {
               console.log("点击事件触发，准备跳转");
               router.push({
-                pathname: "/poetryDetail",
+                pathname: "/showPoetry",
                 params: { poetryid: item.poetryid }
               });
             }}

@@ -15,6 +15,10 @@ const InfoTabs = ({ poetryid }: { poetryid: number }) => {
   const scrollViewRef = useRef<{ scrollTo: (options: { y: number; animated?: boolean }) => void }>(null);
 
   useEffect(() => {
+    // 每次 poetry 变化或组件挂载时，将 index 设置为 0
+    console.log("poetryid", poetryid);
+    console.log("index", index);
+    setIndex(0);
     const fetchInfo = async () => {
       try {
         const info = await InfoDao.getInfosByIds(poetryid, 1);
@@ -31,15 +35,6 @@ const InfoTabs = ({ poetryid }: { poetryid: number }) => {
     };
 
     fetchInfo();
-  }, [poetryid]);
-
-  useEffect(() => {
-    setIndex(infoList.length - 1);
-  }, [infoList]);
-
-  // 每次 poetry 变化或组件挂载时，将 index 设置为 0
-  useEffect(() => {
-    setIndex(0);
   }, [poetryid]);
 
   // 监听 infoList[index] 变化，滚动到顶部

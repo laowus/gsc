@@ -100,8 +100,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    top: 20,
-    padding: 20,
+    padding: 5,
     flexDirection: "column",
     justifyContent: "flex-start",
     gap: 10
