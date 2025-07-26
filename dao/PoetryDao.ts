@@ -101,8 +101,34 @@ const getFirstPoetry: () => Promise<Poetry> = async () => {
   return null;
 };
 
+//加过滤参数
+const getAllPoetry: (params: number[]) => Promise<Poetry[]> = async (params) => {
+  let sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid as dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid`;
+  if (params[0] != 0) {
+    sql += " and p.writerid = " + params[0];
+  }
+  if (params[1] != 0) {
+    sql += " and p.kindid = " + params[1];
+  }
+  if (params[2] != 0) {
+    sql += "  and (p.typeid like '" + params[2] + ",%' or p.typeid like '%," + params[2] + ",%' or p.typeid like '%," + params[2] + "' or p.typeid =" + params[2] + ")";
+  }
+
+  sql += " order by p.poetryid asc";
+
+  const allRows = (await db.getAllAsync(sql, [])) as PoetryRow[];
+  const poetryList = [] as Poetry[];
+  for (const p of allRows) {
+    const writer = new Writer(p.writerid, p.writername, p.dynastyid);
+    const poetry = new Poetry(p.poetryid, p.typeid, p.kindid, writer, p.title, p.content);
+    poetryList.push(poetry);
+  }
+  return poetryList;
+};
+
 export default {
   getPoetryById,
   getPoetryDataAndCount,
-  getFirstPoetry
+  getFirstPoetry,
+  getAllPoetry
 };
