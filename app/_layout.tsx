@@ -2,12 +2,11 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native
 import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { StyleSheet, ActivityIndicator, View, Text } from "react-native";
-
 import { checkDatabaseFile } from "@/utils/tools";
 import { useState, useEffect } from "react";
+import "react-native-reanimated";
 
 const styles = StyleSheet.create({
   container: {
@@ -40,9 +39,9 @@ export default function RootLayout() {
     const loadDatabase = async () => {
       try {
         const exist = await checkDatabaseFile();
-        setIsDatabaseLoaded(exist);
+        setIsDatabaseLoaded(exist as boolean);
         router.push({
-          pathname: "/(tabs)"
+          pathname: "/(tabs)/types"
         });
       } catch (error) {
         console.error("数据库加载出错:", error);

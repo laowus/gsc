@@ -7,6 +7,8 @@ import InfoTabs from "./infoTabs";
 import HtmlParser from "@/components/HtmlParser";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
 import TypeDao from "@/dao/TypeDao";
+import { TouchableOpacity } from "react-native";
+import { ScrollView } from "react-native";
 
 // 获取屏幕高度
 const { height: screenHeight } = Dimensions.get("window");
@@ -28,6 +30,7 @@ type TypeName = {
 export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
   const [typeNames, setTypeNames] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false); // 控制展开折叠状态
 
   useEffect(() => {
     const fetchTypeNames = async () => {
@@ -49,6 +52,9 @@ export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
     fetchTypeNames();
   }, [poetry.poetryid]);
 
+  const fullText = typeNames.join(" / ");
+  const shortText = fullText.length > 20 ? fullText.slice(0, 20) + "..." : fullText;
+
   if (loading) {
     return (
       <ThemedView style={styles.container}>
@@ -59,11 +65,14 @@ export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: COLORS.background }]}>
-      <ThemedView style={styles.writerInfoContainer}>
-        <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} `}</ThemedText>
-        <ThemedText style={styles.typeIdText}>{typeNames.join(" / ")}</ThemedText>
-      </ThemedView>
+      {/* <ThemedView style={styles.writerInfoContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ThemedText style={styles.typeIdText}>{typeNames.join(" / ")}</ThemedText>
+        </ScrollView>
+      </ThemedView> */}
       <ThemedView style={styles.contentContainer}>
+        <ThemedText style={styles.title}>{`${poetry.title}  `}</ThemedText>
+        <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} `}</ThemedText>
         <ScrollViewWithBackToTop>
           <HtmlParser html={poetry.content || ""} fontSize={20} indent={poetry.kindname === "诗" ? 0 : 8} />
         </ScrollViewWithBackToTop>
@@ -76,15 +85,20 @@ export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 5,
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    gap: 5
+  },
   // 样式保持不变
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    padding: 14,
     borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10
+    gap: 10,
+    textAlign: "center"
   },
   noTitle: {
     // 确保 flex 布局
@@ -98,13 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: 10
   },
-  container: {
-    flex: 1,
-    padding: 5,
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    gap: 10
-  },
+
   backButtonText: {
     fontSize: 18,
     color: "#007AFF",
@@ -127,7 +135,8 @@ const styles = StyleSheet.create({
   writerInfo: {
     fontSize: 14,
     color: COLORS.primary,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    marginRight: 10
   },
   typeIdText: {
     fontSize: 14,
@@ -145,7 +154,8 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.secondary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 4
+    shadowRadius: 4,
+    gap: 5
   },
   poetryContent: {
     color: COLORS.text,
@@ -171,7 +181,6 @@ const styles = StyleSheet.create({
   },
   infoTabsContainer: {
     flex: 1,
-    marginTop: 10,
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 10,
@@ -181,5 +190,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     fontSize: 12
+  },
+  expandText: {
+    fontSize: 12,
+    color: COLORS.primary,
+    textAlign: "right"
   }
 });

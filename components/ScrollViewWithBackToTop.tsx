@@ -10,7 +10,7 @@ interface ScrollViewWithBackToTopProps extends React.ComponentProps<typeof Scrol
   backToTopIconSize?: number; // 返回顶部按钮图标的自定义大小
 }
 
-const ScrollViewWithBackToTop = forwardRef<{ scrollTo: (options: { y: number; animated?: boolean }) => void }, ScrollViewWithBackToTopProps>(({ onScroll, showThreshold = 100, backToTopButtonStyle, backToTopIconColor = "#4a90e2", backToTopIconSize = 50, ...scrollViewProps }, ref) => {
+const ScrollViewWithBackToTop = forwardRef<{ scrollTo: (options: { y: number; animated?: boolean }) => void }, ScrollViewWithBackToTopProps>(({ onScroll, showThreshold = 100, backToTopButtonStyle, backToTopIconColor = "#4a90e2", backToTopIconSize = 30, ...scrollViewProps }, ref) => {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
 

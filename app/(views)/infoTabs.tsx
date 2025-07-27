@@ -55,8 +55,8 @@ const InfoTabs = ({ poetryid }: { poetryid: number }) => {
       </ScrollView>
 
       {infoList[index] && (
-        <ScrollViewWithBackToTop ref={scrollViewRef} style={[styles.scrollView, { marginTop: 10 }]} showsVerticalScrollIndicator={false}>
-          <HtmlParser html={infoList[index].content || ""} fontSize={16} indent={0} />
+        <ScrollViewWithBackToTop ref={scrollViewRef} style={[styles.scrollView]} showsVerticalScrollIndicator={false}>
+          <HtmlParser html={infoList[index].content || ""} fontSize={12} indent={0} />
         </ScrollViewWithBackToTop>
       )}
     </ThemedView>
@@ -65,53 +65,40 @@ const InfoTabs = ({ poetryid }: { poetryid: number }) => {
 
 const styles = StyleSheet.create({
   infoTabsContainer: {
-    flex: 1,
-    backgroundColor: "#f9f9f9" // 浅灰色背景
+    flex: 1
   },
 
   titleContainer: {
-    height: 30,
+    height: 40,
     flexDirection: "row",
-    gap: 10,
-    backgroundColor: "#ffffff", // 白色背景
-    elevation: 2, // Android 阴影
-    shadowColor: "#000", // iOS 阴影
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    flexWrap: "nowrap"
+    gap: 5,
+    backgroundColor: "#ffffff" // 白色背景
   },
   tabText: {
-    flexShrink: 0,
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     textAlign: "center",
     borderRadius: 6,
     fontSize: 12,
     color: "#666666", // 深灰色文字
-    height: 30, // 确保文本垂直居中
-    lineHeight: 14 // 大致等于 fontSize
+    height: 30,
+    lineHeight: 12
   },
   activeTabText: {
     backgroundColor: "#4a90e2", // 漂亮的蓝色
     color: "#ffffff", // 白色文字
-    elevation: 1, // Android 阴影
-    shadowColor: "#000", // iOS 阴影
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
     paddingVertical: 8,
     fontSize: 12
   },
   scrollView: {
     backgroundColor: "#ffffff", // 白色背景
     borderRadius: 8,
-    padding: 10,
-    elevation: 2, // Android 阴影
-    shadowColor: "#000", // iOS 阴影
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    marginTop: 5 // 确保垂直 ScrollView 顶部没有间距
+    padding: 8,
+    height: "100%",
+    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4
   },
   backToTopButton: {
     position: "absolute",
@@ -133,6 +120,3 @@ const styles = StyleSheet.create({
 });
 
 export default InfoTabs;
-function setLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}

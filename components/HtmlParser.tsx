@@ -9,7 +9,7 @@ interface HtmlParserProps {
   indent?: number; // 可选缩进属性
 }
 
-const HtmlParser: React.FC<HtmlParserProps> = ({ html, fontSize = 20, indent = 8 }) => {
+const HtmlParser: React.FC<HtmlParserProps> = ({ html, fontSize = 12, indent = 8 }) => {
   // 先将 <br> 系列标签替换为换行符
   const textWithLineBreaks = html.replace(/<br\s*\/?>/gi, "\n");
   // 按换行符分割成段落，并过滤掉空行
@@ -17,12 +17,11 @@ const HtmlParser: React.FC<HtmlParserProps> = ({ html, fontSize = 20, indent = 8
 
   const styles = StyleSheet.create({
     paragraph: {
-      width: "100%",
-      marginBottom: 8,
-      textAlign: "center"
+      width: "100%"
     },
     paragraphText: {
-      fontSize // 使用传入的字体大小
+      fontSize, // 使用传入的字体大小
+      marginBottom: 5
     }
   });
 
@@ -51,7 +50,6 @@ const HtmlParser: React.FC<HtmlParserProps> = ({ html, fontSize = 20, indent = 8
 
     return (
       <ThemedView key={index} style={styles.paragraph}>
-        {/* 直接在 ThemedText 上应用包含字体大小的样式 */}
         <ThemedText style={[styles.paragraphText]}>{parts}</ThemedText>
       </ThemedView>
     );
