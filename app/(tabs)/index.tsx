@@ -42,7 +42,6 @@ export default function HomeScreen() {
     });
   }, [params]);
 
-  // 当 curPid 变化时，从已有列表中获取对应诗歌
   useEffect(() => {
     if (poetryList.length > 0 && curPid < poetryList.length) {
       setCurrentPoetry(poetryList[curPid]);
@@ -51,26 +50,22 @@ export default function HomeScreen() {
 
   return (
     currentPoetry && (
-      <SafeAreaView style={{ flex: 1, gap: 5, padding: 10 }}>
+      <SafeAreaView style={{ flex: 1, gap: 5, padding: 5 }}>
         <ThemedView style={[styles.title]}>
           <TouchableOpacity onPress={prevPid}>
             <ThemedText style={styles.backButtonText}>←</ThemedText>
           </TouchableOpacity>
-          <ThemedText
-            style={{
-              flex: 1, // 占据剩余空间
-              fontSize: 12, // 减小字体大小
-              textAlign: "center" // 文本居中
-            }}
-          >
+          <ThemedText>
             {curPid + 1} / {poetryList.length}
           </ThemedText>
-          <TouchableOpacity onPress={nextPid}>
-            <ThemedText style={styles.backButtonText}> →</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push({ pathname: "/(views)/showPage" })}>
-            <Ionicons name="ellipsis-vertical" size={20} />
-          </TouchableOpacity>
+          <ThemedText>
+            <TouchableOpacity onPress={nextPid}>
+              <ThemedText style={styles.backButtonText}> →</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push({ pathname: "/(views)/setLike" })}>
+              <Ionicons name="ellipsis-vertical" size={20} />
+            </TouchableOpacity>
+          </ThemedText>
         </ThemedView>
         <PoetryDetail poetry={currentPoetry!} />
       </SafeAreaView>
@@ -79,13 +74,14 @@ export default function HomeScreen() {
 }
 const styles = StyleSheet.create({
   title: {
+    margin: 5,
     padding: 5,
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
     justifyContent: "space-between"
-  }, // 新增返回按钮样式
+  },
   backButtonText: {
     fontSize: 18,
     color: "#007AFF",

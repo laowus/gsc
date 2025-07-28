@@ -65,11 +65,6 @@ export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: COLORS.background }]}>
-      {/* <ThemedView style={styles.writerInfoContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <ThemedText style={styles.typeIdText}>{typeNames.join(" / ")}</ThemedText>
-        </ScrollView>
-      </ThemedView> */}
       <ThemedView style={styles.contentContainer}>
         <ThemedText style={styles.title}>{`${poetry.title}  `}</ThemedText>
         <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} `}</ThemedText>
@@ -101,9 +96,7 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   noTitle: {
-    // 确保 flex 布局
     flexDirection: "row",
-    // 让元素均匀分布
     justifyContent: "space-between",
     alignItems: "center",
     fontSize: 24,
@@ -145,7 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: 12
   },
   contentContainer: {
-    maxHeight: screenHeight * 0.4,
+    maxHeight: screenHeight * 0.5,
     height: "auto",
     backgroundColor: "#fff",
     borderRadius: 12,
