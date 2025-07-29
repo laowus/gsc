@@ -4,21 +4,27 @@ import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Platform } from "react-native";
 import TabBarBackground from "@/components/ui/TabBarBackground";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarBackground: TabBarBackground,
+        // 设置 tabBarStyle
         tabBarStyle: Platform.select({
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: "absolute"
+            // 设置 iOS 标签栏顶部间距为状态栏高度
           },
-          default: {}
+          default: {
+            // 设置其他平台标签栏顶部间距为状态栏高度
+          }
         })
       }}
     >

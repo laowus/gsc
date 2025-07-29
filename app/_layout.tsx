@@ -8,6 +8,8 @@ import { checkDatabaseFile } from "@/utils/tools";
 import { useState, useEffect } from "react";
 import "react-native-reanimated";
 import splashIcon from "@/assets/images/splash-icon.png"; // 引入背景图
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import useAppStore from "@/store/appStore";
 
 const styles = StyleSheet.create({
   container: {
@@ -56,6 +58,8 @@ export default function RootLayout() {
   const [isDatabaseLoaded, setIsDatabaseLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const setBarHeight = useAppStore((state) => state.setBarheight);
 
   // 封装数据库加载逻辑
   const loadDatabase = async () => {
@@ -72,6 +76,11 @@ export default function RootLayout() {
   useEffect(() => {
     loadDatabase();
   }, []);
+
+  // 在组件挂载时获取状态栏高度并写入 appStore
+  useEffect(() => {
+    setBarHeight(insets.top);
+  }, [insets.top, setBarHeight]);
 
   // 当字体和数据库都加载完成时跳转
   useEffect(() => {

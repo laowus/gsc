@@ -62,7 +62,6 @@ export default function PoetryScreen() {
   return (
     poetry && (
       <SafeAreaView style={{ flex: 1 }}>
-        {/* 动态设置 top 样式 */}
         <ThemedView style={[styles.titleBase, { top: insets.top }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <ThemedText style={styles.backButtonText}>←</ThemedText>

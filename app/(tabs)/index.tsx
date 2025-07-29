@@ -1,7 +1,6 @@
 import PoetryDetail from "@/app/(views)/poetryDetail";
 import useAppStore from "@/store/appStore";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import PoetryDao from "@/dao/PoetryDao";
@@ -17,6 +16,7 @@ export default function HomeScreen() {
   const params = useAppStore((state) => state.params);
   console.log(params);
   const curPid = useAppStore((state) => state.curPid);
+  const barHeight = useAppStore((state) => state.barHeight);
 
   const nextPid = () => {
     if (curPid < poetryList.length - 1) {
@@ -52,7 +52,7 @@ export default function HomeScreen() {
 
   return (
     currentPoetry && (
-      <SafeAreaView style={{ flex: 1, gap: 5, padding: 5 }}>
+      <ThemedView style={{ flex: 1, gap: 5, paddingTop: barHeight }}>
         <ThemedView style={[styles.title]}>
           <TouchableOpacity onPress={prevPid}>
             <ThemedText style={styles.backButtonText}>←</ThemedText>
@@ -70,13 +70,12 @@ export default function HomeScreen() {
           </ThemedText>
         </ThemedView>
         <PoetryDetail poetry={currentPoetry!} />
-      </SafeAreaView>
+      </ThemedView>
     )
   );
 }
 const styles = StyleSheet.create({
   title: {
-    margin: 5,
     padding: 5,
     borderRadius: 8,
     flexDirection: "row",

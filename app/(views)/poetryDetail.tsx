@@ -64,12 +64,19 @@ export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
   }
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: COLORS.background }]}>
+    <ThemedView style={styles.container}>
       <ThemedView style={styles.contentContainer}>
         <ThemedText style={styles.title}>{`${poetry.title}  `}</ThemedText>
-        <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} `}</ThemedText>
+        <ThemedView style={styles.writerInfoContainer}>
+          <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} (${poetry.kindname})`}</ThemedText>
+          <ThemedView style={{ paddingRight: 15 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <ThemedText style={styles.typeIdText}>{typeNames.join("  /  ")}</ThemedText>
+            </ScrollView>
+          </ThemedView>
+        </ThemedView>
         <ScrollViewWithBackToTop>
-          <HtmlParser html={poetry.content || ""} fontSize={20} indent={poetry.kindname === "诗" ? 0 : 8} />
+          <HtmlParser html={poetry.content || ""} fontSize={20} indent={["诗"].includes(poetry.kindname) ? 0 : 8} center={poetry.kindname === "诗"} />
         </ScrollViewWithBackToTop>
       </ThemedView>
       <ThemedView style={styles.infoTabsContainer}>
@@ -87,7 +94,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     gap: 5
   },
-  // 样式保持不变
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -95,54 +101,11 @@ const styles = StyleSheet.create({
     gap: 10,
     textAlign: "center"
   },
-  noTitle: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    fontSize: 24,
-    fontWeight: "bold",
-    padding: 14,
-    borderRadius: 8,
-    gap: 10
-  },
-
-  backButtonText: {
-    fontSize: 18,
-    color: "#007AFF",
-    marginRight: 10
-  },
-  writerInfoContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#ffffff",
-    borderRadius: 8,
-    padding: 12,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    marginBottom: 10
-  },
-  writerInfo: {
-    fontSize: 14,
-    color: COLORS.primary,
-    fontWeight: "bold",
-    marginRight: 10
-  },
-  typeIdText: {
-    fontSize: 14,
-    color: COLORS.primary,
-    backgroundColor: "#fff",
-    borderRadius: 12
-  },
   contentContainer: {
     maxHeight: screenHeight * 0.5,
-    height: "auto",
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 16,
+    padding: 10,
     elevation: 4,
     shadowColor: COLORS.secondary,
     shadowOffset: { width: 0, height: 2 },
@@ -150,27 +113,18 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     gap: 5
   },
-  poetryContent: {
-    color: COLORS.text,
-    lineHeight: 20
+  writerInfoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
-  like: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    elevation: 4,
-    shadowColor: COLORS.secondary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    overflow: "hidden",
-    marginTop: 10
+  writerInfo: {
+    fontSize: 12,
+    marginRight: 10
   },
-  likeText: {
-    color: COLORS.text,
-    fontSize: 16,
-    fontWeight: "bold",
-    textOverflow: "ellipsis"
+  typeIdText: {
+    fontSize: 12,
+    color: COLORS.primary
   },
   infoTabsContainer: {
     flex: 1,
@@ -183,10 +137,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     fontSize: 12
-  },
-  expandText: {
-    fontSize: 12,
-    color: COLORS.primary,
-    textAlign: "right"
   }
 });

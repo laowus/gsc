@@ -59,6 +59,8 @@ export default function setLikeScreen() {
     console.log("did", did, "wid", wid, "kid", kid, "ptid", ptid, "ctid", ctid);
     setDid(did);
     fetchWriters(true);
+    // wid 获取
+
     setWid(wid);
     setKid(kid);
     setPtid(ptid);
@@ -136,7 +138,7 @@ export default function setLikeScreen() {
               data={writerList.map((writer) => ({ key: writer.writerid, value: writer.writername }))}
               save="key"
               defaultOption={{
-                key: wid,
+                key: writerList.findIndex((writer) => writer.writerid === wid),
                 value: writerList.find((writer) => writer.writerid == wid)?.writername || ""
               }}
               dropdownStyles={{ position: "absolute", top: 50, left: 0, right: 0, zIndex: 999, backgroundColor: "white" }}
