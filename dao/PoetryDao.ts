@@ -79,7 +79,7 @@ interface CountResult {
   total: number;
 }
 
-const getPoetryById: (poetryid: number) => Promise<Poetry> = async (poetryid) => {
+const getPoetryById: (poetryid: number) => Promise<Poetry | null> = async (poetryid) => {
   const sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid where p.poetryid = ?`;
   const p = (await db.getFirstAsync(sql, [poetryid])) as PoetryRow;
   if (p) {
@@ -90,7 +90,7 @@ const getPoetryById: (poetryid: number) => Promise<Poetry> = async (poetryid) =>
   return null;
 };
 
-const getFirstPoetry: () => Promise<Poetry> = async () => {
+const getFirstPoetry: () => Promise<Poetry | null> = async () => {
   const sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid order by p.poetryid limit 1`;
   const p = (await db.getFirstAsync(sql, [])) as PoetryRow;
   if (p) {
@@ -104,18 +104,18 @@ const getFirstPoetry: () => Promise<Poetry> = async () => {
 //加过滤参数
 const getAllPoetry: (params: number[]) => Promise<Poetry[]> = async (params) => {
   let sql = `select p.poetryid,p.kindid,p.typeid,w.dynastyid as dynastyid,w.writerid,w.writername,p.title, p.content from Poetry p join Writer w on p.writerid = w.writerid`;
-  if (params[0] != 0) {
-    sql += " and p.writerid = " + params[0];
-  }
   if (params[1] != 0) {
-    sql += " and p.kindid = " + params[1];
+    sql += " and p.writerid = " + params[1];
   }
   if (params[2] != 0) {
-    sql += "  and (p.typeid like '" + params[2] + ",%' or p.typeid like '%," + params[2] + ",%' or p.typeid like '%," + params[2] + "' or p.typeid =" + params[2] + ")";
+    sql += " and p.kindid = " + params[2];
+  }
+  if (params[4] != 0) {
+    sql += "  and (p.typeid like '" + params[4] + ",%' or p.typeid like '%," + params[4] + ",%' or p.typeid like '%," + params[4] + "' or p.typeid =" + params[4] + ")";
   }
 
   sql += " order by p.poetryid asc";
-
+  console.log("sql:", sql);
   const allRows = (await db.getAllAsync(sql, [])) as PoetryRow[];
   const poetryList = [] as Poetry[];
   for (const p of allRows) {

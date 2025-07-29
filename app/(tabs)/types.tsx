@@ -3,7 +3,7 @@ import { StyleSheet, Dimensions, View, Platform, ScrollView } from "react-native
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import TypesDao from "@/dao/TypeDao";
+import TypeDao from "@/dao/TypeDao";
 import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
@@ -22,10 +22,10 @@ export default function Types() {
   const [index, setIndex] = useState<number>(1);
 
   useEffect(() => {
-    TypesDao.getChildTypes(0).then((res) => {
+    TypeDao.getChildTypes(0).then((res) => {
       setParentTypes(res as ParentType[]);
     });
-    TypesDao.getChildTypes(index).then((res) => {
+    TypeDao.getChildTypes(index).then((res) => {
       setChildTypes(res as ParentType[]);
     });
   }, [index]);

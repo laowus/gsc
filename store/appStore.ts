@@ -14,7 +14,8 @@ type AppStore = {
 const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
-      params: [0, 0, 0],
+      //did 作者所属朝代id wid作者id, kid体裁id, ptid一级类型id, ctid二级类型id
+      params: [0, 0, 0, 0, 0],
       curPid: 0,
       setParams: (params: number[]) => {
         set({ params: params });

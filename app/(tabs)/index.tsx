@@ -15,6 +15,7 @@ export default function HomeScreen() {
   const [poetryList, setPoetryList] = useState<Poetry[]>([]);
   const [currentPoetry, setCurrentPoetry] = useState<Poetry | null>(null);
   const params = useAppStore((state) => state.params);
+  console.log(params);
   const curPid = useAppStore((state) => state.curPid);
 
   const nextPid = () => {
@@ -33,6 +34,7 @@ export default function HomeScreen() {
 
   // 仅在 params 变化时重新获取诗歌列表
   useEffect(() => {
+    const params = [0, 0, 0, 0, 0];
     PoetryDao.getAllPoetry(params).then((pList) => {
       setPoetryList(pList);
       if (pList.length > 0 && curPid < pList.length) {
