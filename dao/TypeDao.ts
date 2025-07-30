@@ -24,9 +24,16 @@ const getTypeNameById = async (typeid: number) => {
   }
   return null;
 };
+// 二级分类 获取一级分类的名称和parentid
+const getParentAndTypeById = async (typeid: number) => {
+  const sql = `select p.typeid as pid , p.typename as pname, t.typeid, t.typename from type t, (select * from type where parentid=0) p where t.parentid=p.typeid and t.typeid=${typeid}`;
+  const allRows = await db.getAllAsync(sql);
+  return allRows;
+};
 
 export default {
   getChildTypes,
   getTypeNamByIds,
-  getTypeNameById
+  getTypeNameById,
+  getParentAndTypeById
 };

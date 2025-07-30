@@ -29,7 +29,7 @@ export default function setLikeScreen() {
   const [wid, setWid] = useState(0); //作者id
   const [kid, setKid] = useState(0); //体裁
   const [ptid, setPtid] = useState(0); //一级类型
-  const [ptName, setPtName] = useState(""); //一级类型名称
+  const [ptName, setPtName] = useState("不限"); //一级类型名称
   const [ctid, setCtid] = useState(0); //二级类型
   const [ctName, setCtName] = useState(""); //二级类型名称
 
@@ -64,17 +64,34 @@ export default function setLikeScreen() {
     //分类处理
     setCtid(params[2]);
 
-    TypeDao.getTypeNameById(params[2]).then((res) => {
-      console.log("获取二级分类名称", res);
-      if (res) {
-        setCtName(res.typename);
-        setPtid(res.parentid || 0);
-        //获取一级分类名称
-        TypeDao.getTypeNameById(res.parentid || 0).then((res) => {
-          if (res) {
-            setPtName(res.typename);
+    //获取一级分类列表
+    TypeDao.getChildTypes(0).then((res) => {
+      //给一级列表插入第一个元素 {typeid:0,typename:"不限",parentid:999}
+      res.unshift(type1);
+      setParentTypes(res);
+      if (params[2] !== 0) {
+        TypeDao.getParentAndTypeById(params[2]).then((res: any) => {
+          if (res.length > 0) {
+            setPtName(res[0].pname);
+            setPtid(res[0].pid);
+            setCtName(res[0].typename);
+            TypeDao.getChildTypes(res[0].pid).then((res) => {
+              setChildTypes(res);
+            });
           }
         });
+      } else {
+        if (res.length > 0) {
+          console.log("最新的分类列表", res);
+          // 确保 res 不为空再设置状态
+          setPtName(res[0].typename);
+          setPtid(res[0].typeid);
+        } else {
+          console.log("getChildTypes 返回空数组");
+          // 设置默认值
+          setPtName("不限");
+          setPtid(0);
+        }
       }
     });
   }, []);
@@ -111,6 +128,7 @@ export default function setLikeScreen() {
       } else {
         //一级分类为空,二级分类也为空
         setChildTypes([]);
+        setCtid(0);
       }
     }
   };
@@ -220,6 +238,7 @@ export default function setLikeScreen() {
             setSelected={(val: number) => {
               if (val !== ptid) {
                 changePt(val);
+                console.log("setSelected一级分类", val);
               }
             }}
             data={parentTypes.map((item) => ({
