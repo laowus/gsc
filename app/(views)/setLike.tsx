@@ -12,7 +12,14 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import useAppStore from "@/store/appStore";
 
-const type1 = new Type(0, "不限");
+const type1 = new Type(0, "不限", 999);
+/**
+ * 思路:
+ * wid => 获取did
+ * kid
+ * ctid => 获取ptid
+ *
+ */
 
 export default function setLikeScreen() {
   const navigation = useNavigation();
@@ -22,7 +29,9 @@ export default function setLikeScreen() {
   const [wid, setWid] = useState(0); //作者id
   const [kid, setKid] = useState(0); //体裁
   const [ptid, setPtid] = useState(0); //一级类型
+  const [ptName, setPtName] = useState(""); //一级类型名称
   const [ctid, setCtid] = useState(0); //二级类型
+  const [ctName, setCtName] = useState(""); //二级类型名称
 
   const [writerName, setWriterName] = useState("");
   const [writerList, setWriterList] = useState<Writer[]>([]);
@@ -30,75 +39,105 @@ export default function setLikeScreen() {
   const [parentTypes, setParentTypes] = useState<Type[]>([]);
   const [childTypes, setChildTypes] = useState<Type[]>([]);
 
-  const fetchWriters = async (isInit: boolean) => {
-    if (did != 0) {
-      const res = await WriterDao.getWritersByDid(did);
-      if (res.length > 0) {
-        setWriterList(res);
-        !isInit ? setWid(res[0].writerid) : setWid(wid);
-      }
-    }
-  };
-
   //空依赖,初始化数据
   useEffect(() => {
+    console.log("获取params", params);
     //去默认顶部栏
     navigation.setOptions({
       headerShown: false
     });
-
-    //获取类型的第一级数据
-    const initPtlist = async () => {
-      TypeDao.getChildTypes(0).then((res) => {
-        const newRes = [type1, ...res];
-        setParentTypes(newRes);
+    /**
+     * 根据wid,设置wid, 获取作者信息,并设置did
+     */
+    WriterDao.getWriterByWid(params[0]).then((res) => {
+      setDid(res.dynastyid);
+      setWid(res.writerid);
+      setWriterName(res.writername);
+      //获取作者列表
+      WriterDao.getWritersByDid(res.dynastyid).then((res) => {
+        setWriterList(res);
       });
-    };
-    initPtlist();
-    const [did, wid, kid, ptid, ctid] = params;
-    console.log("did", did, "wid", wid, "kid", kid, "ptid", ptid, "ctid", ctid);
-    setDid(did);
-    fetchWriters(true);
-    // wid 获取
+    });
+    //体裁
+    setKid(params[1]);
 
-    setWid(wid);
-    setKid(kid);
-    setPtid(ptid);
-    setCtid(ctid);
+    //分类处理
+    setCtid(params[2]);
+
+    TypeDao.getTypeNameById(params[2]).then((res) => {
+      console.log("获取二级分类名称", res);
+      if (res) {
+        setCtName(res.typename);
+        setPtid(res.parentid || 0);
+        //获取一级分类名称
+        TypeDao.getTypeNameById(res.parentid || 0).then((res) => {
+          if (res) {
+            setPtName(res.typename);
+          }
+        });
+      }
+    });
   }, []);
 
-  useEffect(() => {
-    console.log("改变", did);
-    fetchWriters(false);
-  }, [did]);
+  const changeParams = () => {
+    console.log("作者wid", wid, "体裁kid", kid, "二级分类ctid", ctid);
+    //生成一个params,保存到appStore
+    const params = [wid, kid, ctid];
+    useAppStore.setState({ params });
+    navigation.goBack();
+  };
 
-  useEffect(() => {
-    //一级分类改变,二级分类也改变
-    const fetchChilds = async () => {
+  const changeWriter = (wid: number) => {
+    // 添加检查，避免在初始化时不必要的更新
+    if (wid !== undefined && wid !== null) {
+      console.log("改变作者", wid);
+      setWid(wid);
+      setWriterName(writerList.find((writer) => writer.writerid === wid)?.writername || "");
+    }
+  };
+
+  const changePt = (ptid: number) => {
+    if (ptid !== undefined && ptid !== null) {
+      setPtid(ptid);
+      setPtName(parentTypes.find((type) => type.typeid === ptid)?.typename || "");
       if (ptid != 0) {
-        const res = await TypeDao.getChildTypes(ptid);
-        setChildTypes(res);
-        //一级分类改变,二级分类默认第一个
-        setCtid(res[0].typeid);
+        //更新二级分类信息
+        TypeDao.getChildTypes(ptid).then((res) => {
+          setChildTypes(res); //更新二级分类
+          //二级分类改变,默认第一个
+          setCtid(res[0].typeid);
+          setCtName(res[0].typename);
+        });
       } else {
         //一级分类为空,二级分类也为空
         setChildTypes([]);
       }
-    };
-    fetchChilds();
-  }, [ptid]);
-
-  const setWriter = (wid: number) => {
-    setWid(wid);
-    setWriterName(writerList.find((writer) => writer.writerid == wid)?.writername || "");
+    }
   };
 
-  const changeParams = () => {
-    console.log("作者wid", wid, "体裁kid", kid, "一级分类ptid", ptid, "一级分类ctid", ctid);
-    //生成一个params,保存到appStore
-    const params = [did, wid, kid, ptid, ctid];
-    useAppStore.setState({ params });
-    navigation.goBack();
+  const changeCt = (ctid: number) => {
+    if (ctid !== undefined && ctid !== null) {
+      setCtid(ctid);
+      setCtName(childTypes.find((type) => type.typeid === ctid)?.typename || "");
+    }
+  };
+
+  const changeDynasty = (did: number) => {
+    if (did !== undefined && did !== null) {
+      setDid(did);
+      if (did != 0) {
+        //更新二级分类信息
+        WriterDao.getWritersByDid(did).then((res) => {
+          setWriterList(res); //更新二级分类
+          //二级分类改变,默认第一个
+          setWid(res[0].writerid);
+          setWriterName(res[0].writername);
+        });
+      } else {
+        //朝代为空 作者列表也为空
+        setWriterList([]);
+      }
+    }
   };
 
   return (
@@ -118,7 +157,11 @@ export default function setLikeScreen() {
         <ThemedText style={styles.title}>作者 :</ThemedText>
         <ThemedView style={styles.dynastyname}>
           <SelectList
-            setSelected={setDid}
+            setSelected={(val: number) => {
+              if (val !== did) {
+                changeDynasty(val);
+              }
+            }}
             data={DYNASTYS.map((dynasty, index) => ({
               key: index,
               value: dynasty
@@ -134,12 +177,16 @@ export default function setLikeScreen() {
         <ThemedView style={styles.writername}>
           {did != 0 && (
             <SelectList
-              setSelected={setWid}
+              setSelected={(val: number) => {
+                if (val !== wid) {
+                  changeWriter(val);
+                }
+              }}
               data={writerList.map((writer) => ({ key: writer.writerid, value: writer.writername }))}
               save="key"
               defaultOption={{
-                key: writerList.findIndex((writer) => writer.writerid === wid),
-                value: writerList.find((writer) => writer.writerid == wid)?.writername || ""
+                key: wid,
+                value: writerName
               }}
               dropdownStyles={{ position: "absolute", top: 50, left: 0, right: 0, zIndex: 999, backgroundColor: "white" }}
             />
@@ -170,7 +217,11 @@ export default function setLikeScreen() {
         <ThemedText style={styles.title}>类型 :</ThemedText>
         <ThemedView style={styles.dynastyname}>
           <SelectList
-            setSelected={setPtid}
+            setSelected={(val: number) => {
+              if (val !== ptid) {
+                changePt(val);
+              }
+            }}
             data={parentTypes.map((item) => ({
               key: item.typeid,
               value: item.typename
@@ -178,15 +229,19 @@ export default function setLikeScreen() {
             save="key"
             dropdownStyles={{ position: "absolute", top: 50, left: 0, right: 0, zIndex: 999, backgroundColor: "white" }}
             defaultOption={{
-              key: ptid || 0,
-              value: parentTypes.find((type) => type.typeid == ptid)?.typename || "不限"
+              key: ptid,
+              value: ptName
             }}
           />
         </ThemedView>
         <ThemedView style={styles.writername}>
           {childTypes.length > 0 && (
             <SelectList
-              setSelected={setCtid}
+              setSelected={(val: number) => {
+                if (val !== ctid) {
+                  changeCt(val);
+                }
+              }}
               data={childTypes.map((item) => ({
                 key: item.typeid,
                 value: item.typename
@@ -194,8 +249,8 @@ export default function setLikeScreen() {
               save="key"
               dropdownStyles={{ position: "absolute", top: 50, left: 0, right: 0, zIndex: 999, backgroundColor: "white" }}
               defaultOption={{
-                key: ctid || 0,
-                value: childTypes.find((type) => type.typeid == ctid)?.typename || "不限"
+                key: ctid,
+                value: ctName
               }}
             />
           )}

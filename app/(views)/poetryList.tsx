@@ -79,7 +79,7 @@ const PoetryList: React.FC<PoetryListProps> = ({ initialQueryParams = {}, pageSi
       >
         <ThemedView style={{ flex: 1, justifyContent: "center" }}>
           <ThemedText style={[styles.titleText, { marginBottom: 4 }]}>{`${index + 1}、 ${item.title}`}</ThemedText>
-          <ThemedText style={styles.subtitleText}>{`${item.writer.dynasty} · ${item.writer.writername}`}</ThemedText>
+          <ThemedText style={styles.subtitleText}>{`${item.writer.dynastyname} · ${item.writer.writername}`}</ThemedText>
         </ThemedView>
         <ThemedText style={[styles.contentText, { flex: 2 }]}>
           {`${previewContent} ... `}

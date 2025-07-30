@@ -1,9 +1,11 @@
 class Type {
   typeid: number;
   typename: string;
-  constructor(typeid: number, typename: string) {
+  parentid?: number;
+  constructor(typeid: number, typename: string, parentid?: number) {
     this.typeid = typeid;
     this.typename = typename;
+    this.parentid = parentid;
   }
 }
 

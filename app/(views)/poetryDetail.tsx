@@ -68,12 +68,10 @@ export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
       <ThemedView style={styles.contentContainer}>
         <ThemedText style={styles.title}>{`${poetry.title}  `}</ThemedText>
         <ThemedView style={styles.writerInfoContainer}>
-          <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynasty} * ${poetry.writer.writername} (${poetry.kindname})`}</ThemedText>
-          <ThemedView style={{ paddingRight: 15 }}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <ThemedText style={styles.typeIdText}>{typeNames.join("  /  ")}</ThemedText>
-            </ScrollView>
-          </ThemedView>
+          <ThemedText style={styles.writerInfo}>{`${poetry.writer.dynastyname} * ${poetry.writer.writername} (${poetry.kindname})`}</ThemedText>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <ThemedText style={styles.typeIdText}>{typeNames.join("  /  ")}</ThemedText>
+          </ScrollView>
         </ThemedView>
         <ScrollViewWithBackToTop>
           <HtmlParser html={poetry.content || ""} fontSize={20} indent={["诗"].includes(poetry.kindname) ? 0 : 8} center={poetry.kindname === "诗"} />
@@ -120,7 +118,7 @@ const styles = StyleSheet.create({
   },
   writerInfo: {
     fontSize: 12,
-    marginRight: 10
+    marginRight: 15
   },
   typeIdText: {
     fontSize: 12,

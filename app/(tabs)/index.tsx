@@ -14,7 +14,6 @@ export default function HomeScreen() {
   const [poetryList, setPoetryList] = useState<Poetry[]>([]);
   const [currentPoetry, setCurrentPoetry] = useState<Poetry | null>(null);
   const params = useAppStore((state) => state.params);
-  console.log(params);
   const curPid = useAppStore((state) => state.curPid);
   const barHeight = useAppStore((state) => state.barHeight);
 
