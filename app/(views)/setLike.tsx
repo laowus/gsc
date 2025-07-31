@@ -1,6 +1,6 @@
 import { SelectList } from "react-native-dropdown-select-list";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DYNASTYS, KINDS } from "@/constants/Utils";
@@ -11,6 +11,7 @@ import TypeDao from "@/dao/TypeDao";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import useAppStore from "@/store/appStore";
+import PoetryDao from "@/dao/PoetryDao";
 
 const type1 = new Type(0, "不限", 999);
 /**
@@ -99,9 +100,27 @@ export default function setLikeScreen() {
   const changeParams = () => {
     console.log("作者wid", wid, "体裁kid", kid, "二级分类ctid", ctid);
     //生成一个params,保存到appStore
+    // 获取当前过滤参数下 是否有内容
     const params = [wid, kid, ctid];
-    useAppStore.setState({ params });
-    navigation.goBack();
+    PoetryDao.getAllPoetry(params).then((res) => {
+      if (res.length > 0) {
+        // 有内容,直接返回
+        useAppStore.setState({ params });
+        navigation.goBack();
+      } else {
+        Alert.alert(
+          "提示",
+          "没有你喜欢的诗词,请重新选择!",
+          [
+            {
+              text: "确定",
+              style: "default"
+            }
+          ],
+          { cancelable: false }
+        );
+      }
+    });
   };
 
   const changeWriter = (wid: number) => {
@@ -154,6 +173,8 @@ export default function setLikeScreen() {
       } else {
         //朝代为空 作者列表也为空
         setWriterList([]);
+        setWid(0);
+        setWriterName("");
       }
     }
   };

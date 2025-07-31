@@ -33,7 +33,7 @@ export default function HomeScreen() {
 
   // 仅在 params 变化时重新获取诗歌列表
   useEffect(() => {
-    const params = [0, 0, 0, 0, 0];
+    // const params = [0, 0, 0, 0, 0];
     PoetryDao.getAllPoetry(params).then((pList) => {
       setPoetryList(pList);
       if (pList.length > 0 && curPid < pList.length) {
