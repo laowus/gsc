@@ -72,8 +72,12 @@ const RhesisList = () => {
     <SafeView>
       <ThemedView style={[styles.title]}>
         <ThemedText>名句({count})</ThemedText>
-        <TextInput style={styles.input} placeholder="输入索引" value={inputIndex} onChangeText={setInputIndex} keyboardType="numeric" />
-        <Button title="滚动" style={styles.scrollButton}  onPress={scrollToIndex} />
+        <View style={styles.scrollButton}>
+          <ThemedText onPress={scrollToIndex} style={{ textAlign: "center", color: "#007AFF" }}>
+            跳转
+          </ThemedText>
+          <TextInput style={styles.input} placeholder="序号" value={inputIndex} onChangeText={setInputIndex} keyboardType="numeric" />
+        </View>
       </ThemedView>
       <FlatList
         ref={flatListRef}
@@ -99,6 +103,7 @@ const styles = StyleSheet.create({
     borderRadius: 6, // 减小圆角半径
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: 8, // 减小间距
     elevation: 3, // 减小阴影强度
     shadowColor: "#000",
@@ -134,31 +139,36 @@ const styles = StyleSheet.create({
     color: "#666"
   },
   circleNumber: {
-    width: 24, // 减小圆圈大小
+    minWidth: 40, // 设置最小宽度以显示千位数字
     height: 24,
-    borderRadius: 12, // 减小圆角半径
+    borderRadius: 4, // 减小圆角半径使其更接近矩形
     borderWidth: 0,
     backgroundColor: "#4285f4",
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
     textAlignVertical: "center",
-    fontSize: 12, // 减小字体大小
-    color: "#fff"
+    fontSize: 12,
+    color: "#fff",
+    paddingHorizontal: 8 // 添加水平内边距
   },
   input: {
     height: 28, // 减小高度
     borderColor: "#ccc",
     borderWidth: 0.5,
-    flex: 0.5, // 减小 flex 值以减小宽度
+    // 减小 flex 值以减小宽度
     padding: 3, // 减小内边距
     borderRadius: 3, // 减小圆角半径
     fontSize: 10, // 减小字体大小
-    backgroundColor: "#f9f9f9"
+    backgroundColor: "#f9f9f9",
+    width: 60
   },
   scrollButton: {
+    width: "40%",
     marginVertical: 3, // 减小垂直间距
-    marginHorizontal: 6 // 减小水平间距
+    marginHorizontal: 6, // 减小水平间距
+    flexDirection: "row",
+    gap: 10
   }
 });
 
