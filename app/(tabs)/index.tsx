@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Poetry from "@/model/Poetry";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import SafeView from "@/components/SafeView";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -15,7 +16,6 @@ export default function HomeScreen() {
   const [currentPoetry, setCurrentPoetry] = useState<Poetry | null>(null);
   const params = useAppStore((state) => state.params);
   const curPid = useAppStore((state) => state.curPid);
-  const barHeight = useAppStore((state) => state.barHeight);
 
   const nextPid = () => {
     if (curPid < poetryList.length - 1) {
@@ -51,7 +51,7 @@ export default function HomeScreen() {
 
   return (
     currentPoetry && (
-      <ThemedView style={{ flex: 1, gap: 5, paddingTop: barHeight }}>
+      <SafeView>
         <ThemedView style={[styles.title]}>
           <TouchableOpacity onPress={prevPid}>
             <ThemedText style={styles.backButtonText}>←</ThemedText>
@@ -69,7 +69,7 @@ export default function HomeScreen() {
           </ThemedText>
         </ThemedView>
         <PoetryDetail poetry={currentPoetry!} />
-      </ThemedView>
+      </SafeView>
     )
   );
 }

@@ -1,6 +1,7 @@
 import db from "@/constants/Db";
 import Poetry from "@/model/Poetry";
 import Writer from "@/model/Writer";
+import Rhesis from "@/model/Rhesis";
 
 // 定义接口描述从数据库查询出的诗歌行数据结构
 interface PoetryRow {
@@ -126,9 +127,42 @@ const getAllPoetry: (params: number[]) => Promise<Poetry[]> = async (params) => 
   return poetryList;
 };
 
+// 修改 getRhesis 函数，添加分页参数，默认每页20条数据，同时返回总数
+const getRhesis: (page: number, pageSize: number) => Promise<{ data: Rhesis[]; total: number }> = async (page = 1, pageSize = 20) => {
+  const offset = (page - 1) * pageSize;
+  const dataSql = `SELECT r.rhesisid, r.rcontent, p.poetryid, p.title, w.writername, w.dynastyid FROM rhesis r join poetry p on r.poetryid=p.poetryid inner join writer w on p.writerid=w.writerid order by r.rhesisid asc LIMIT ? OFFSET ?`;
+  const countSql = `SELECT COUNT(*) as total FROM rhesis r join poetry p on r.poetryid=p.poetryid inner join writer w on p.writerid=w.writerid`;
+
+  try {
+    // 并发执行查询
+    const [allRows, countResult] = await Promise.all([db.getAllAsync(dataSql, [pageSize, offset]), db.getFirstAsync(countSql, [])]);
+
+    const rhesisList = allRows.map((item: any) => ({
+      rhesisid: item.rhesisid,
+      rcontent: item.rcontent,
+      poetryid: item.poetryid,
+      title: item.title,
+      writername: item.writername,
+      dynastyid: item.dynastyid
+    })) as Rhesis[];
+
+    return {
+      data: rhesisList,
+      total: (countResult as { total: number }).total
+    };
+  } catch (error) {
+    console.error("获取名句数据和总数时出错:", error);
+    return {
+      data: [],
+      total: 0
+    };
+  }
+};
+
 export default {
   getPoetryById,
   getPoetryDataAndCount,
   getFirstPoetry,
-  getAllPoetry
+  getAllPoetry,
+  getRhesis
 };
