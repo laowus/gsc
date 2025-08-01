@@ -158,11 +158,34 @@ const getRhesis: (page: number, pageSize: number) => Promise<{ data: Rhesis[]; t
     };
   }
 };
+const getAllRhesis: () => Promise<Rhesis[]> = async () => {
+  const sql = `SELECT r.rhesisid, r.rcontent, p.poetryid, p.title, w.writername, w.dynastyid FROM rhesis r join poetry p on r.poetryid=p.poetryid inner join writer w on p.writerid=w.writerid order by r.rhesisid asc `;
+
+  try {
+    // 并发执行查询
+    const allRows = await db.getAllAsync(sql, []);
+
+    const rhesisList = allRows.map((item: any) => ({
+      rhesisid: item.rhesisid,
+      rcontent: item.rcontent,
+      poetryid: item.poetryid,
+      title: item.title,
+      writername: item.writername,
+      dynastyid: item.dynastyid
+    })) as Rhesis[];
+
+    return rhesisList;
+  } catch (error) {
+    console.error("获取名句数据和总数时出错:", error);
+    return [];
+  }
+};
 
 export default {
   getPoetryById,
   getPoetryDataAndCount,
   getFirstPoetry,
   getAllPoetry,
-  getRhesis
+  getRhesis,
+  getAllRhesis
 };
