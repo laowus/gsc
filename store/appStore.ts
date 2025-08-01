@@ -9,6 +9,8 @@ type AppStore = {
   curPid: number;
   pos: number;
   setPos: (pos: number) => void;
+  curRid: number;
+  setCurRid: (rid: number) => void;
   setBarheight: (height: number) => void;
   setParams: (params: number[]) => void;
   setCurPid: (pid: number) => void;
@@ -23,6 +25,10 @@ const useAppStore = create<AppStore>()(
       params: [0, 0, 0],
       curPid: 0,
       pos: 0,
+      curRid: 0,
+      setCurRid: (rid: number) => {
+        set({ curRid: rid });
+      },
       setPos: (pos: number) => {
         set({ pos: pos });
       },

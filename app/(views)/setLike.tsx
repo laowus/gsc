@@ -106,6 +106,7 @@ export default function setLikeScreen() {
       if (res.length > 0) {
         // 有内容,直接返回
         useAppStore.setState({ params });
+        useAppStore.setState({ curPid: 0 });
         navigation.goBack();
       } else {
         Alert.alert(
