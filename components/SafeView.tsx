@@ -1,15 +1,11 @@
 import React from "react";
-import { ThemedView } from "@/components/ThemedView";
+import { View, type ViewProps } from "react-native";
 import useAppStore from "@/store/appStore";
 
-interface CustomThemedViewProps {
-  children: React.ReactNode;
-}
-
-const SafeView: React.FC<CustomThemedViewProps> = ({ children }) => {
+export function SafeView({ style, ...otherProps }: ViewProps) {
   const barHeight = useAppStore((state) => state.barHeight);
 
-  return <ThemedView style={{ flex: 1, gap: 5, paddingTop: barHeight }}>{children}</ThemedView>;
-};
+  return <View style={[{ flex: 1, gap: 5, paddingTop: barHeight, padding: 10 }, style]} {...otherProps} />;
+}
 
 export default SafeView;

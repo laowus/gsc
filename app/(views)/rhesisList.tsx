@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { StyleSheet, FlatList, Button, View, TextInput } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, FlatList, View, TextInput } from "react-native";
 import { useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import PoetryDao from "@/dao/PoetryDao";
@@ -59,10 +59,10 @@ const RhesisList = () => {
   };
 
   const scrollToIndex = () => {
-    const index = parseInt(inputIndex, 10);
+    const index = parseInt(inputIndex, 10) + 2;
     if (!isNaN(index) && flatListRef.current && index >= 0 && index < dbData.length) {
       flatListRef.current.scrollToIndex({
-        index,
+        index: index,
         animated: true
       });
     }
@@ -85,8 +85,8 @@ const RhesisList = () => {
         renderItem={renderItem}
         keyExtractor={(item, index) => `${item.poetryid}-${index}`}
         getItemLayout={(data, index) => ({
-          length: 80, // 减小每个 item 的高度
-          offset: 80 * index,
+          length: 100,
+          offset: 100 * index,
           index
         })}
         decelerationRate="fast" // 加快滚动减速
@@ -124,7 +124,8 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 3
+    shadowRadius: 3,
+    height: 100 // 在 renderItem 对应样式里固定高度
   },
   titleText: {
     flex: 1,

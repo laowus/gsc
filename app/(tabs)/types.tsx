@@ -5,6 +5,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import TypeDao from "@/dao/TypeDao";
 import { router } from "expo-router";
+import SafeView from "@/components/SafeView";
 
 const { width } = Dimensions.get("window");
 const titleWidth = width / 5;
@@ -39,7 +40,7 @@ export default function Types() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeView style={styles.container}>
       <ThemedView style={[styles.titleContainer, { width: titleWidth }]}>
         <View style={styles.titleWrapper}>
           {parentTypes.map((item) => (
@@ -71,16 +72,13 @@ export default function Types() {
           </View>
         </ScrollView>
       </ThemedView>
-    </SafeAreaView>
+    </SafeView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-    flex: 1,
-    flexDirection: "row",
-    gap: 16
+    flexDirection: "row"
   },
   titleContainer: {
     backgroundColor: "#ffffff",

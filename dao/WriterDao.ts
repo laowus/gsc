@@ -10,8 +10,12 @@ interface WriterRow {
 
 // 按朝代id查询
 const getWritersByDid = async (did: number): Promise<Writer[]> => {
-  // 修改排序规则为 COLLATE UNICODE 实现中文排序
-  const sql = `SELECT * FROM Writer WHERE dynastyid = ${did} order by writername`;
+  let sql = `SELECT *  FROM Writer`;
+  if (did > 0) {
+    sql += ` WHERE dynastyid = ${did}`;
+  }
+  sql += ` order by writername`;
+  console.log("按获取查询", sql);
   const allRows = (await db.getAllAsync(sql)) as WriterRow[];
   return allRows.map((row) => new Writer(row.writerid, row.writername, row.dynastyid, row.summary));
 };
@@ -22,4 +26,14 @@ const getWriterByWid = async (wid: number): Promise<Writer> => {
   return new Writer(row[0].writerid, row[0].writername, row[0].dynastyid, row[0].summary);
 };
 
-export default { getWritersByDid, getWriterByWid };
+// 获取朝代下面的 作者数量
+const getWCountByDid = async (did: number): Promise<number> => {
+  let sql = `SELECT count(*) as sum  FROM Writer`;
+  if (did > 0) {
+    sql += ` WHERE dynastyid = ${did}`;
+  }
+  const row = (await db.getFirstAsync(sql)) as { sum: number };
+  return row["sum"];
+};
+
+export default { getWritersByDid, getWriterByWid, getWCountByDid };
