@@ -50,7 +50,6 @@ export default function Types() {
           ))}
         </View>
       </ThemedView>
-
       <ThemedView style={[styles.waterfallContainer, { width: waterfallWidth }]}>
         <ScrollView showsVerticalScrollIndicator={true}>
           <View style={styles.waterfallWrapper}>

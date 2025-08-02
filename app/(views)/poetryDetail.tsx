@@ -74,7 +74,7 @@ export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
           </ScrollView>
         </ThemedView>
         <ScrollViewWithBackToTop>
-          <HtmlParser html={poetry.content || ""} fontSize={20} indent={["诗"].includes(poetry.kindname) ? 0 : 8} center={poetry.kindname === "诗"} />
+          <HtmlParser html={poetry.content || ""} fontSize={20} indent={["诗", "文言文"].includes(poetry.kindname) ? 0 : 8} center={poetry.kindname === "诗"} />
         </ScrollViewWithBackToTop>
       </ThemedView>
       <ThemedView style={styles.infoTabsContainer}>

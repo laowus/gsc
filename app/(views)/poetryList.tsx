@@ -8,6 +8,7 @@ import PoetryDao from "@/dao/PoetryDao";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import SafeView from "@/components/SafeView";
 
 // 只保留需要从外部传入的属性
 type PoetryListProps = {
@@ -130,7 +131,7 @@ const PoetryList: React.FC<PoetryListProps> = ({ initialQueryParams = {}, pageSi
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, gap: 5, padding: 10 }}>
+    <SafeView>
       <ThemedView style={[styles.title]}>
         {!isNested && (
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -143,7 +144,7 @@ const PoetryList: React.FC<PoetryListProps> = ({ initialQueryParams = {}, pageSi
         {dbData.map((item, index) => renderItem({ item, index }))}
         {renderFooter()}
       </ScrollViewWithBackToTop>
-    </SafeAreaView>
+    </SafeView>
   );
 };
 

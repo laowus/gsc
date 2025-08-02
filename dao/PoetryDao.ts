@@ -31,6 +31,9 @@ const getPoetryDataAndCount: (page: number, pageSize: number, params?: Record<st
         // 针对 keyword 使用 LIKE 查询
         //values.push(value);
         return `p.title LIKE '%,${value},%' OR w.writername LIKE '%,${value},%' OR p.content LIKE '%,${value},%'`;
+      } else if (key === "writerid") {
+        // 针对 writerid 使用 = 查询
+        return `p.writerid = ${value}`;
       } else {
         values.push(value);
         return `${key} = ${value}`;
@@ -51,6 +54,7 @@ const getPoetryDataAndCount: (page: number, pageSize: number, params?: Record<st
   const countSql = `SELECT COUNT(*) as total FROM Poetry p join Writer w on p.writerid = w.writerid ${whereClause}`;
   const countValues = [...values.slice(2)]; // 移除 limit 和 offset 参数
 
+  console.log(countSql, countValues);
   try {
     // 并发执行查询
     const [allRows, countResult] = await Promise.all([db.getAllAsync(dataSql, values), db.getFirstAsync(countSql, countValues)]);

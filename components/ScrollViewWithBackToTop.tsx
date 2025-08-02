@@ -53,7 +53,7 @@ const ScrollViewWithBackToTop = forwardRef<{ scrollTo: (options: { y: number; an
 const styles = StyleSheet.create({
   backToTopButton: {
     position: "absolute",
-    bottom: 50,
+    bottom: 30,
     right: 20,
     elevation: 5,
     shadowColor: "#000",

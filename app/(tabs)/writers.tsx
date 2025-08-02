@@ -6,6 +6,7 @@ import { DYNASTYS } from "@/constants/Utils";
 import { useEffect, useRef, useState } from "react";
 import WriterDao from "@/dao/WriterDao";
 import Writer from "@/model/Writer";
+import { router } from "expo-router";
 
 type WriterCount = {
   did: number;
@@ -200,9 +201,18 @@ export default function WriterScreen() {
           <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={true}>
             <View style={styles.waterfallWrapper}>
               {curWList.map((item, index) => (
-                <ThemedView key={item.writerid} style={[styles.waterfallItem, { backgroundColor: itemBackgroundColors[index % itemBackgroundColors.length] }]}>
-                  <ThemedText style={styles.itemText}>{item.writername}</ThemedText>
-                </ThemedView>
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    router.push({
+                      pathname: "/poetryList",
+                      params: { writerid: item.writerid, writername: item.writername }
+                    });
+                  }}
+                >
+                  <ThemedView key={item.writerid} style={[styles.waterfallItem, { backgroundColor: itemBackgroundColors[index % itemBackgroundColors.length] }]}>
+                    <ThemedText style={styles.itemText}>{item.writername}</ThemedText>
+                  </ThemedView>
+                </TouchableWithoutFeedback>
               ))}
             </View>
           </ScrollView>
