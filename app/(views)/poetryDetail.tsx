@@ -7,7 +7,6 @@ import InfoTabs from "./infoTabs";
 import HtmlParser from "@/components/HtmlParser";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
 import TypeDao from "@/dao/TypeDao";
-import { TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native";
 
 // 获取屏幕高度
@@ -78,7 +77,7 @@ export default function PoetryDetail({ poetry }: { poetry: Poetry }) {
         </ScrollViewWithBackToTop>
       </ThemedView>
       <ThemedView style={styles.infoTabsContainer}>
-        <InfoTabs poetryid={poetry.poetryid} />
+        <InfoTabs paraid={poetry.poetryid} isPoetry={true} />
       </ThemedView>
     </ThemedView>
   );

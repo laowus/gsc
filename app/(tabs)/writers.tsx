@@ -195,7 +195,7 @@ export default function WriterScreen() {
     <SafeView>
       <ThemedView style={styles.container}>
         <ThemedView style={[styles.leftDynasty, { width: titleWidth }]}>
-          <FlatList data={writerCounts} renderItem={renderItem}></FlatList>
+          <FlatList data={writerCounts} renderItem={renderItem} keyExtractor={(item, index) => `${item.did}-${index}`}></FlatList>
         </ThemedView>
         <ThemedView style={[styles.waterfallContainer, { width: waterfallWidth }]}>
           <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={true}>
@@ -204,7 +204,7 @@ export default function WriterScreen() {
                 <TouchableWithoutFeedback
                   onPress={() => {
                     router.push({
-                      pathname: "/poetryList",
+                      pathname: "/showWriter",
                       params: { writerid: item.writerid, writername: item.writername }
                     });
                   }}

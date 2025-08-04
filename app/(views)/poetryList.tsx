@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, NativeSyntheticEvent, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import PoetryDao from "@/dao/PoetryDao";
 import ScrollViewWithBackToTop from "@/components/ScrollViewWithBackToTop";
@@ -20,6 +19,7 @@ type PoetryListProps = {
 const PoetryList: React.FC<PoetryListProps> = ({ initialQueryParams = {}, pageSize = 20, isNested = false }) => {
   const params = useLocalSearchParams();
   // 提取 writername 和 typename
+  console.log(params);
   const { writername, typename, ...restParams } = params;
 
   const router = useRouter();

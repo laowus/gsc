@@ -17,7 +17,6 @@
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.16",
     "@react-navigation/native-stack": "^7.3.23",
-    "expo": "~53.0.17",
     "expo-asset": "~11.1.7",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
@@ -52,14 +51,18 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "react-native-zip-archive": "^7.0.1",
-    "zustand": "^5.0.6"
+    "zustand": "^5.0.6",
+    "expo-updates": "~0.28.17",
+    "expo": "~53.0.20"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
+    "expo": "^53.0.20",
     "typescript": "~5.8.3"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@4.9.2+sha512.1fc009bc09d13cfd0e19efa44cbfc2b9cf6ca61482725eb35bbc5e257e093ebf4130db6dfe15d604ff4b79efd8e1e8e99b25fa7d0a6197c9f9826358d4d65c3c"
 }

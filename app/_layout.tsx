@@ -7,7 +7,7 @@ import { StyleSheet, ActivityIndicator, View, Text, ImageBackground } from "reac
 import { checkDatabaseFile } from "@/utils/tools";
 import { useState, useEffect } from "react";
 import "react-native-reanimated";
-import splashIcon from "@/assets/images/splash-icon.png"; // 引入背景图
+// 引入背景图
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useAppStore from "@/store/appStore";
 
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 // 封装加载状态展示组件
 const LoadingScreen = ({ loaded, isDatabaseLoaded, loadingError }: { loaded: boolean; isDatabaseLoaded: boolean; loadingError: string | null }) => {
   return (
-    <ImageBackground source={splashIcon} style={styles.backgroundImage}>
+    <View>
       {!loaded && <Text style={{ color: "white" }}>加载中...</Text>}
       {!isDatabaseLoaded && (
         <>
@@ -46,7 +46,7 @@ const LoadingScreen = ({ loaded, isDatabaseLoaded, loadingError }: { loaded: boo
           {loadingError && <Text style={styles.error}>{loadingError}</Text>}
         </>
       )}
-    </ImageBackground>
+    </View>
   );
 };
 

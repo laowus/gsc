@@ -8,7 +8,7 @@ import { StyleSheet, ScrollView } from "react-native";
 import Info from "@/model/Info";
 import InfoDao from "@/dao/InfoDao";
 
-const InfoTabs = ({ poetryid }: { poetryid: number }) => {
+const InfoTabs = ({ paraid, isPoetry }: { paraid: number; isPoetry: boolean }) => {
   const [index, setIndex] = useState(0);
   const [infoList, setInfoList] = useState<Info[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,12 +16,12 @@ const InfoTabs = ({ poetryid }: { poetryid: number }) => {
 
   useEffect(() => {
     // 每次 poetry 变化或组件挂载时，将 index 设置为 0
-    console.log("poetryid", poetryid);
+    console.log("poetryid", paraid);
     console.log("index", index);
     setIndex(0);
     const fetchInfo = async () => {
       try {
-        const info = await InfoDao.getInfosByIds(poetryid, 1);
+        const info = await InfoDao.getInfosByIds(paraid, isPoetry ? 1 : 0);
         setInfoList(info);
       } catch (error) {
         if (error instanceof Error) {
@@ -35,7 +35,7 @@ const InfoTabs = ({ poetryid }: { poetryid: number }) => {
     };
 
     fetchInfo();
-  }, [poetryid]);
+  }, [paraid]);
 
   // 监听 infoList[index] 变化，滚动到顶部
   useEffect(() => {

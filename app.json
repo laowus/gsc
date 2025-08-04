@@ -11,14 +11,25 @@
     "ios": {
       "supportsTablet": true
     },
-    "assets": ["./assets/database/poem.zip"],
+    "assets": [
+      "./assets/database/poem.zip"
+    ],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "permissions": ["WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"],
+      "permissions": [
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ],
       "package": "com.laowus.gsc"
     },
     "web": {
@@ -41,6 +52,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7ccec6f9-c7b6-47d0-861f-1ec002fdca50"
+      }
+    },
+    "owner": "laowus",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7ccec6f9-c7b6-47d0-861f-1ec002fdca50"
     }
   }
 }
